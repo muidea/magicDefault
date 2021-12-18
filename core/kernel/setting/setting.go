@@ -1,8 +1,9 @@
 package setting
 
 import (
-	"github.com/muidea/magicCommon/application"
+	"github.com/muidea/magicCommon/event"
 	"github.com/muidea/magicCommon/module"
+	"github.com/muidea/magicCommon/task"
 	"github.com/muidea/magicDefault/common"
 	"github.com/muidea/magicDefault/core/kernel/setting/biz"
 	"github.com/muidea/magicDefault/core/kernel/setting/service"
@@ -25,11 +26,13 @@ func (s *Setting) ID() string {
 	return common.SettingModule
 }
 
-func (s *Setting) Setup(endpointName string) {
-	app := application.GetApp()
+func (s *Setting) Setup(
+	endpointName string,
+	eventHub event.Hub,
+	backgroundRoutine task.BackgroundRoutine) {
 	s.biz = biz.New(
-		app.EventHub(),
-		app.BackgroundRoutine(),
+		eventHub,
+		backgroundRoutine,
 	)
 
 	s.service = service.New(s.biz)

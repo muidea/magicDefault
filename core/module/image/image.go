@@ -1,8 +1,9 @@
 package authority
 
 import (
-	"github.com/muidea/magicCommon/application"
+	"github.com/muidea/magicCommon/event"
 	"github.com/muidea/magicCommon/module"
+	"github.com/muidea/magicCommon/task"
 	"github.com/muidea/magicDefault/common"
 	"github.com/muidea/magicDefault/config"
 	"github.com/muidea/magicDefault/core/module/image/biz"
@@ -26,11 +27,13 @@ func (s *Image) ID() string {
 	return common.ImageModule
 }
 
-func (s *Image) Setup(endpointName string) {
-	app := application.GetApp()
+func (s *Image) Setup(
+	endpointName string,
+	eventHub event.Hub,
+	backgroundRoutine task.BackgroundRoutine) {
 	s.biz = biz.New(endpointName, config.FileService(),
-		app.EventHub(),
-		app.BackgroundRoutine(),
+		eventHub,
+		backgroundRoutine,
 	)
 
 	s.service = service.New(s.biz)

@@ -3,6 +3,7 @@ package core
 import (
 	"fmt"
 	"github.com/muidea/magicCommon/module"
+	"github.com/muidea/magicCommon/task"
 	"net"
 	"net/http"
 	"strings"
@@ -95,7 +96,9 @@ func (s *Core) Name() string {
 }
 
 // Startup 启动
-func (s *Core) Startup() {
+func (s *Core) Startup(
+	eventHub event.Hub,
+	backgroundRoutine task.BackgroundRoutine) {
 	router := engine.NewRouter()
 	registry.New(s, s, s, router)
 
@@ -104,7 +107,7 @@ func (s *Core) Startup() {
 
 	modules := module.GetModules()
 	for _, val := range modules {
-		val.Setup(s.endpointName)
+		val.Setup(s.endpointName, eventHub, backgroundRoutine)
 	}
 }
 
