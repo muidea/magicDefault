@@ -2,8 +2,7 @@ package biz
 
 import (
 	log "github.com/cihub/seelog"
-	"github.com/muidea/magicDefault/assist/persistence"
-
+	"github.com/muidea/magicBatis/client"
 	bc "github.com/muidea/magicBatis/common"
 
 	casClient "github.com/muidea/magicCas/client"
@@ -31,18 +30,14 @@ type Base struct {
 
 func New(
 	casService string,
+	batisClient client.Client,
 	eventHub event.Hub,
 	backgroundRoutine task.BackgroundRoutine,
 ) *Base {
-	batisClnt, batisErr := persistence.GetBatisClient()
-	if batisErr != nil {
-		log.Criticalf("get batis client failed, err:%s", batisErr.Error())
-	}
-
 	ptr := &Base{
 		Base:       biz.New(common.BaseModule, eventHub, backgroundRoutine),
 		casService: casService,
-		baseDao:    dao.New(batisClnt),
+		baseDao:    dao.New(batisClient),
 	}
 
 	eventHub.Subscribe(common.QueryEntity, ptr)

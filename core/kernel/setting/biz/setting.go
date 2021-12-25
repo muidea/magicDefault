@@ -2,11 +2,10 @@ package biz
 
 import (
 	"fmt"
-	log "github.com/cihub/seelog"
+	"github.com/muidea/magicBatis/client"
 	"github.com/muidea/magicCommon/event"
 	commonSession "github.com/muidea/magicCommon/session"
 	"github.com/muidea/magicCommon/task"
-	"github.com/muidea/magicDefault/assist/persistence"
 	"github.com/muidea/magicDefault/common"
 	"github.com/muidea/magicDefault/config"
 	"github.com/muidea/magicDefault/core/base/biz"
@@ -22,17 +21,13 @@ type Setting struct {
 }
 
 func New(
+	batisClient client.Client,
 	eventHub event.Hub,
 	backgroundRoutine task.BackgroundRoutine,
 ) *Setting {
-	batisClnt, batisErr := persistence.GetBatisClient()
-	if batisErr != nil {
-		log.Criticalf("get batis client failed, err:%s", batisErr.Error())
-	}
-
 	ptr := &Setting{
 		Base:       biz.New(common.SettingModule, eventHub, backgroundRoutine),
-		settingDao: dao.New(batisClnt),
+		settingDao: dao.New(batisClient),
 		startTime:  time.Now(),
 	}
 

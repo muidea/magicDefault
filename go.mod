@@ -9,6 +9,4 @@ require (
 	github.com/muidea/magicCommon v0.0.0-20211223103203-25165e21c59a
 	github.com/muidea/magicEngine v0.0.0-20211219074645-49a3a434d25e
 	github.com/muidea/magicFile v0.0.0-20211225064802-f0e94b05f56f
-	golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3 // indirect
-	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
 )

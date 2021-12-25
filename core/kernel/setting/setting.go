@@ -7,6 +7,7 @@ import (
 
 	"github.com/muidea/magicCas/toolkit"
 
+	"github.com/muidea/magicDefault/assist/persistence"
 	"github.com/muidea/magicDefault/common"
 	"github.com/muidea/magicDefault/core/kernel/setting/biz"
 	"github.com/muidea/magicDefault/core/kernel/setting/service"
@@ -52,6 +53,7 @@ func (s *Setting) Setup(
 	eventHub event.Hub,
 	backgroundRoutine task.BackgroundRoutine) {
 	s.biz = biz.New(
+		persistence.GetBatisClient(),
 		eventHub,
 		backgroundRoutine,
 	)

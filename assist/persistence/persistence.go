@@ -63,10 +63,10 @@ func Uninitialize() {
 	})
 }
 
-func GetBatisClient() (ret client.Client, err error) {
+func GetBatisClient() (ret client.Client) {
 	if batisClient == nil {
-		err = fmt.Errorf("must initialze persistence first")
-		return
+		err := fmt.Errorf("must initialze persistence first")
+		panic(err)
 	}
 
 	ret = batisClient

@@ -19,6 +19,7 @@ import (
 	casCommon "github.com/muidea/magicCas/common"
 	"github.com/muidea/magicCas/toolkit"
 
+	"github.com/muidea/magicDefault/assist/persistence"
 	"github.com/muidea/magicDefault/common"
 	"github.com/muidea/magicDefault/config"
 
@@ -87,11 +88,16 @@ func (s *Core) Startup(
 	routeRegistry := toolkit.NewRouteRegistry(router)
 	casRegistry := toolkit.NewCasRegistry(s, router)
 	roleRegistry := toolkit.NewRoleRegistry(s, router)
+
+	persistence.Initialize(s.endpointName)
+
 	s.httpServer = engine.NewHTTPServer(s.listenPort)
 	s.httpServer.Bind(router)
 
 	modules := module.GetModules()
 	for _, val := range modules {
+
+		module.BindBatisClient(val, persistence.GetBatisClient())
 
 		module.BindRegistry(val, routeRegistry, casRegistry, roleRegistry)
 
@@ -109,6 +115,8 @@ func (s *Core) Shutdown() {
 	for _, val := range modules {
 		module.Teardown(val)
 	}
+
+	persistence.Uninitialize()
 }
 
 func (s *Core) OnTimeOut(session session.Session) {

@@ -2,10 +2,9 @@ package biz
 
 import (
 	log "github.com/cihub/seelog"
-	casCommon "github.com/muidea/magicCas/common"
-	"github.com/muidea/magicDefault/assist/persistence"
-
+	"github.com/muidea/magicBatis/client"
 	bc "github.com/muidea/magicBatis/common"
+	casCommon "github.com/muidea/magicCas/common"
 
 	"github.com/muidea/magicCommon/event"
 	"github.com/muidea/magicCommon/task"
@@ -25,17 +24,13 @@ type Totalizer struct {
 }
 
 func New(
+	batisClient client.Client,
 	eventHub event.Hub,
 	backgroundRoutine task.BackgroundRoutine,
 ) *Totalizer {
-	batisClnt, batisErr := persistence.GetBatisClient()
-	if batisErr != nil {
-		log.Criticalf("get batis client failed, err:%s", batisErr.Error())
-	}
-
 	totalizer := &Totalizer{
 		Base:                biz.New(common.TotalizerModule, eventHub, backgroundRoutine),
-		totalizerDao:        dao.New(batisClnt),
+		totalizerDao:        dao.New(batisClient),
 		namespace2Totalizer: Namespace2Totalizer{},
 	}
 
