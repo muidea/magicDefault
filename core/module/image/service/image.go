@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net"
@@ -11,12 +12,10 @@ import (
 	fn "github.com/muidea/magicCommon/foundation/net"
 	fu "github.com/muidea/magicCommon/foundation/util"
 
-	commonDef "github.com/muidea/magicCommon/def"
-	commonSession "github.com/muidea/magicCommon/session"
-	engine "github.com/muidea/magicEngine"
-
 	casCommon "github.com/muidea/magicCas/common"
 	casToolkit "github.com/muidea/magicCas/toolkit"
+	commonDef "github.com/muidea/magicCommon/def"
+	commonSession "github.com/muidea/magicCommon/session"
 
 	fileCommon "github.com/muidea/magicFile/common"
 
@@ -26,10 +25,11 @@ import (
 )
 
 type Image struct {
-	sessionRegistry   commonSession.Registry
+	routeRegistry     casToolkit.RouteRegistry
 	casRouteRegistry  casToolkit.CasRegistry
 	roleRouteRegistry casToolkit.RoleRegistry
-	validator         fu.Validator
+
+	validator fu.Validator
 
 	bizPtr *biz.Image
 }
@@ -46,27 +46,13 @@ func New(
 }
 
 func (s *Image) BindRegistry(
-	sessionRegistry commonSession.Registry,
+	routeRegistry casToolkit.RouteRegistry,
 	casRouteRegistry casToolkit.CasRegistry,
 	roleRouteRegistry casToolkit.RoleRegistry) {
 
-	s.sessionRegistry = sessionRegistry
+	s.routeRegistry = routeRegistry
 	s.casRouteRegistry = casRouteRegistry
 	s.roleRouteRegistry = roleRouteRegistry
-}
-
-// Handle middleware handler
-func (s *Image) Handle(ctx engine.RequestContext, res http.ResponseWriter, req *http.Request) {
-	curSession := s.sessionRegistry.GetSession(res, req)
-
-	sessionInfo := curSession.GetSessionInfo()
-	sessionInfo.Scope = commonSession.ShareSession
-
-	values := req.URL.Query()
-	values = sessionInfo.Encode(values)
-	req.URL.RawQuery = values.Encode()
-
-	ctx.Next()
 }
 
 // RegisterRoute 注册路由
@@ -77,13 +63,13 @@ func (s *Image) RegisterRoute() {
 	s.roleRouteRegistry.AddHandler(common.DeleteImage, "DELETE", casCommon.DeletePrivate, s.DeleteImage)
 }
 
-func (s *Image) FilterImage(res http.ResponseWriter, req *http.Request) {
-	filter := commonDef.NewFilter()
+func (s *Image) FilterImage(ctx context.Context, res http.ResponseWriter, req *http.Request) {
+	filter := fu.NewFilter()
 	filter.Decode(req)
 
 	result := &common.ImageStatisticResult{}
 	for {
-		curNamespace := s.getCurrentNamespace(res, req)
+		curNamespace := s.getCurrentNamespace(ctx, res, req)
 		imageList, imageTotal, imageErr := s.bizPtr.FilterImage(filter, curNamespace)
 		if imageErr != nil {
 			result.ErrorCode = commonDef.Failed
@@ -110,7 +96,7 @@ func (s *Image) FilterImage(res http.ResponseWriter, req *http.Request) {
 	res.WriteHeader(http.StatusExpectationFailed)
 }
 
-func (s *Image) QueryImage(res http.ResponseWriter, req *http.Request) {
+func (s *Image) QueryImage(ctx context.Context, res http.ResponseWriter, req *http.Request) {
 	result := &common.ImageResult{}
 	for {
 		id, err := fn.SplitRESTID(req.URL.Path)
@@ -120,7 +106,7 @@ func (s *Image) QueryImage(res http.ResponseWriter, req *http.Request) {
 			break
 		}
 
-		curNamespace := s.getCurrentNamespace(res, req)
+		curNamespace := s.getCurrentNamespace(ctx, res, req)
 		imagePtr, imageErr := s.bizPtr.QueryImage(id, curNamespace)
 		if imageErr != nil {
 			result.ErrorCode = commonDef.Failed
@@ -143,7 +129,7 @@ func (s *Image) QueryImage(res http.ResponseWriter, req *http.Request) {
 	res.WriteHeader(http.StatusExpectationFailed)
 }
 
-func (s *Image) UpdateImage(res http.ResponseWriter, req *http.Request) {
+func (s *Image) UpdateImage(ctx context.Context, res http.ResponseWriter, req *http.Request) {
 	result := &common.ImageResult{}
 	for {
 		id, err := fn.SplitRESTID(req.URL.Path)
@@ -161,7 +147,7 @@ func (s *Image) UpdateImage(res http.ResponseWriter, req *http.Request) {
 			break
 		}
 
-		curNamespace := s.getCurrentNamespace(res, req)
+		curNamespace := s.getCurrentNamespace(ctx, res, req)
 		imagePtr, imageErr := s.bizPtr.UpdateImage(id, param, curNamespace)
 		if imageErr != nil {
 			result.ErrorCode = commonDef.Failed
@@ -184,7 +170,7 @@ func (s *Image) UpdateImage(res http.ResponseWriter, req *http.Request) {
 	res.WriteHeader(http.StatusExpectationFailed)
 }
 
-func (s *Image) DeleteImage(res http.ResponseWriter, req *http.Request) {
+func (s *Image) DeleteImage(ctx context.Context, res http.ResponseWriter, req *http.Request) {
 	result := &common.ImageResult{}
 	for {
 		id, err := fn.SplitRESTID(req.URL.Path)
@@ -194,7 +180,7 @@ func (s *Image) DeleteImage(res http.ResponseWriter, req *http.Request) {
 			break
 		}
 
-		curNamespace := s.getCurrentNamespace(res, req)
+		curNamespace := s.getCurrentNamespace(ctx, res, req)
 		imagePtr, imageErr := s.bizPtr.DeleteImage(id, curNamespace)
 		if imageErr != nil {
 			result.ErrorCode = commonDef.Failed
@@ -217,8 +203,8 @@ func (s *Image) DeleteImage(res http.ResponseWriter, req *http.Request) {
 	res.WriteHeader(http.StatusExpectationFailed)
 }
 
-func (s *Image) getCurrentEntity(res http.ResponseWriter, req *http.Request) (ret *casCommon.EntityView, err error) {
-	curSession := s.sessionRegistry.GetSession(res, req)
+func (s *Image) getCurrentEntity(ctx context.Context, res http.ResponseWriter, req *http.Request) (ret *casCommon.EntityView, err error) {
+	curSession := ctx.Value(commonSession.AuthSession).(commonSession.Session)
 	authVal, ok := curSession.GetOption(commonSession.AuthAccount)
 	if !ok {
 		err = fmt.Errorf("无效权限,未通过验证")
@@ -228,7 +214,7 @@ func (s *Image) getCurrentEntity(res http.ResponseWriter, req *http.Request) (re
 	return
 }
 
-func (s *Image) getCurrentNamespace(res http.ResponseWriter, req *http.Request) (ret string) {
+func (s *Image) getCurrentNamespace(ctx context.Context, res http.ResponseWriter, req *http.Request) (ret string) {
 	namespace := req.Header.Get(casCommon.NamespaceID)
 	if namespace != "" {
 		ret = namespace
@@ -256,10 +242,10 @@ func (s *Image) queryEntity(sessionInfo *commonSession.SessionInfo, id int, name
 	return
 }
 
-func (s *Image) writeLog(res http.ResponseWriter, req *http.Request, memo string) {
+func (s *Image) writeLog(ctx context.Context, res http.ResponseWriter, req *http.Request, memo string) {
 	address := fn.GetHTTPRemoteAddress(req)
-	curEntity, _ := s.getCurrentEntity(res, req)
-	curNamespace := s.getCurrentNamespace(res, req)
+	curEntity, _ := s.getCurrentEntity(ctx, res, req)
+	curNamespace := s.getCurrentNamespace(ctx, res, req)
 	logPtr := &model.Log{Address: address, Memo: memo, Creater: curEntity.ID, CreateTime: time.Now().UTC().Unix()}
 	s.bizPtr.WriteLog(logPtr, curNamespace)
 }

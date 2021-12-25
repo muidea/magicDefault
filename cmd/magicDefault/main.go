@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/muidea/magicCommon/application"
-	"github.com/muidea/magicDefault/assist/persistence"
 	"net/http"
 	_ "net/http/pprof"
 
@@ -38,12 +37,6 @@ func main() {
 	initPprofMonitor(listenPort)
 
 	fmt.Printf("magicDefault V1.0\n")
-	err := persistence.Initialize(endpointName)
-	if err != nil {
-		log.Errorf("initialize persistence failed, err:%s", err.Error())
-		return
-	}
-	defer persistence.Uninitialize()
 
 	core, err := core.New(endpointName, listenPort)
 	if err != nil {
@@ -51,8 +44,7 @@ func main() {
 		return
 	}
 
-	app := application.GetApp()
-	app.Startup(core)
-	app.Run()
-	app.Shutdown()
+	application.Startup(core)
+	application.Run()
+	application.Shutdown()
 }

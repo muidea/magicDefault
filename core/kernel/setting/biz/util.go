@@ -2,8 +2,8 @@ package biz
 
 import (
 	casCommon "github.com/muidea/magicCas/common"
-	"github.com/muidea/magicCommon/def"
 	"github.com/muidea/magicCommon/event"
+	fu "github.com/muidea/magicCommon/foundation/util"
 	commonSession "github.com/muidea/magicCommon/session"
 	"github.com/muidea/magicDefault/common"
 )
@@ -14,7 +14,7 @@ func (s *Setting) queryNamespace(sessionInfo *commonSession.SessionInfo, namespa
 	header.Set("namespace", namespace)
 	header.Set("sessionInfo", sessionInfo)
 
-	filter := def.NewFilter()
+	filter := fu.NewFilter()
 	filter.Set("name", namespace)
 	eventPtr := event.NewEvent(eid, s.ID(), common.AuthorityModule, header, filter)
 	result := s.CallEvent(eventPtr)

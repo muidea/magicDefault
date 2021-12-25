@@ -16,9 +16,9 @@ var batisUninitializeOnce sync.Once
 var batisClient client.Client
 
 var databaseServer = ""
-var databaseName = "magicwechat_db"
-var databaseUsername = "magicwechat"
-var databasePassword = "magicwechat"
+var databaseName = "magicdefault_db"
+var databaseUsername = "magicdefault"
+var databasePassword = "magicdefault"
 var maxConnNum = 10
 var batisService = "http://localhost:8080"
 

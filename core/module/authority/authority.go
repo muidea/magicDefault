@@ -1,6 +1,7 @@
 package authority
 
 import (
+	"github.com/muidea/magicCas/toolkit"
 	"github.com/muidea/magicCommon/event"
 	"github.com/muidea/magicCommon/module"
 	"github.com/muidea/magicCommon/task"
@@ -15,6 +16,10 @@ func init() {
 }
 
 type Authority struct {
+	routeRegistry     toolkit.RouteRegistry
+	casRouteRegistry  toolkit.CasRegistry
+	roleRouteRegistry toolkit.RoleRegistry
+
 	service *service.Authority
 	biz     *biz.Authority
 }
@@ -27,6 +32,20 @@ func (s *Authority) ID() string {
 	return common.AuthorityModule
 }
 
+func (s *Authority) BindRegistry(
+	routeRegistry toolkit.RouteRegistry,
+	casRouteRegistry toolkit.CasRegistry,
+	roleRouteRegistry toolkit.RoleRegistry) {
+
+	s.routeRegistry = routeRegistry
+	s.casRouteRegistry = casRouteRegistry
+	s.roleRouteRegistry = roleRouteRegistry
+
+	s.routeRegistry.SetApiVersion(common.ApiVersion)
+	s.casRouteRegistry.SetApiVersion(common.ApiVersion)
+	s.roleRouteRegistry.SetApiVersion(common.ApiVersion)
+}
+
 func (s *Authority) Setup(
 	endpointName string,
 	eventHub event.Hub,
@@ -37,6 +56,7 @@ func (s *Authority) Setup(
 	)
 
 	s.service = service.New(s.biz)
+	s.service.BindRegistry(s.routeRegistry, s.casRouteRegistry, s.roleRouteRegistry)
 	s.service.RegisterRoute()
 }
 

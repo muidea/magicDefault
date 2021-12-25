@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net"
@@ -10,7 +11,6 @@ import (
 	commonDef "github.com/muidea/magicCommon/def"
 	fu "github.com/muidea/magicCommon/foundation/util"
 	commonSession "github.com/muidea/magicCommon/session"
-	engine "github.com/muidea/magicEngine"
 
 	casCommon "github.com/muidea/magicCas/common"
 	casToolkit "github.com/muidea/magicCas/toolkit"
@@ -20,10 +20,11 @@ import (
 )
 
 type Setting struct {
-	sessionRegistry   commonSession.Registry
+	routeRegistry     casToolkit.RouteRegistry
 	casRouteRegistry  casToolkit.CasRegistry
 	roleRouteRegistry casToolkit.RoleRegistry
-	validator         fu.Validator
+
+	validator fu.Validator
 
 	settingBiz *biz.Setting
 }
@@ -39,18 +40,14 @@ func New(
 	return ptr
 }
 
-// Handle middleware handler
-func (s *Setting) Handle(ctx engine.RequestContext, res http.ResponseWriter, req *http.Request) {
-	curSession := s.sessionRegistry.GetSession(res, req)
+func (s *Setting) BindRegistry(
+	routeRegistry casToolkit.RouteRegistry,
+	casRouteRegistry casToolkit.CasRegistry,
+	roleRouteRegistry casToolkit.RoleRegistry) {
 
-	sessionInfo := curSession.GetSessionInfo()
-	sessionInfo.Scope = commonSession.ShareSession
-
-	values := req.URL.Query()
-	values = sessionInfo.Encode(values)
-	req.URL.RawQuery = values.Encode()
-
-	ctx.Next()
+	s.routeRegistry = routeRegistry
+	s.casRouteRegistry = casRouteRegistry
+	s.roleRouteRegistry = roleRouteRegistry
 }
 
 // RegisterRoute 注册路由
@@ -60,8 +57,8 @@ func (s *Setting) RegisterRoute() {
 	s.roleRouteRegistry.AddHandler(common.ViewSettingProfile, "GET", casCommon.ReadPrivate, s.ViewSettingProfile)
 }
 
-func (s *Setting) getCurrentEntity(res http.ResponseWriter, req *http.Request) (ret *casCommon.EntityView, err error) {
-	curSession := s.sessionRegistry.GetSession(res, req)
+func (s *Setting) getCurrentEntity(ctx context.Context, res http.ResponseWriter, req *http.Request) (ret *casCommon.EntityView, err error) {
+	curSession := ctx.Value(commonSession.AuthSession).(commonSession.Session)
 	authVal, ok := curSession.GetOption(commonSession.AuthAccount)
 	if !ok {
 		err = fmt.Errorf("无效权限,未通过验证")
@@ -71,7 +68,7 @@ func (s *Setting) getCurrentEntity(res http.ResponseWriter, req *http.Request) (
 	return
 }
 
-func (s *Setting) getCurrentNamespace(res http.ResponseWriter, req *http.Request) (ret string) {
+func (s *Setting) getCurrentNamespace(ctx context.Context, res http.ResponseWriter, req *http.Request) (ret string) {
 	namespace := req.Header.Get(casCommon.NamespaceID)
 	if namespace != "" {
 		ret = namespace
@@ -94,12 +91,12 @@ func (s *Setting) getCurrentNamespace(res http.ResponseWriter, req *http.Request
 	return
 }
 
-func (s *Setting) ViewSetting(res http.ResponseWriter, req *http.Request) {
+func (s *Setting) ViewSetting(ctx context.Context, res http.ResponseWriter, req *http.Request) {
+	curSession := ctx.Value(commonSession.AuthSession).(commonSession.Session)
 	result := &common.SettingResult{Item: []*common.Content{}}
 	for {
-		curSession := s.sessionRegistry.GetSession(res, req)
-		curNamespace := s.getCurrentNamespace(res, req)
-		curEntity, curErr := s.getCurrentEntity(res, req)
+		curNamespace := s.getCurrentNamespace(ctx, res, req)
+		_, curErr := s.getCurrentEntity(ctx, res, req)
 		if curErr != nil {
 			result.ErrorCode = commonDef.Failed
 			result.Reason = "查询用户失败"
@@ -113,10 +110,10 @@ func (s *Setting) ViewSetting(res http.ResponseWriter, req *http.Request) {
 			break
 		}
 
-		if curEntity.IsAdmin() {
-			onlineItem := &common.Content{Name: "在线人数", Content: fmt.Sprintf("%d", s.sessionRegistry.CountSession(&namespaceFilter{namespace: curNamespace}))}
-			itemList = append(itemList, onlineItem)
-		}
+		//if curEntity.IsAdmin() {
+		//	onlineItem := &common.Content{Name: "在线人数", Content: fmt.Sprintf("%d", s.sessionRegistry.CountSession(&namespaceFilter{namespace: curNamespace}))}
+		//	itemList = append(itemList, onlineItem)
+		//}
 
 		result.Item = itemList
 		break

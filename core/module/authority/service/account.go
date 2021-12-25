@@ -1,19 +1,22 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	casCommon "github.com/muidea/magicCas/common"
 	commonDef "github.com/muidea/magicCommon/def"
 	fn "github.com/muidea/magicCommon/foundation/net"
+	fu "github.com/muidea/magicCommon/foundation/util"
+	commonSession "github.com/muidea/magicCommon/session"
 	"net/http"
 )
 
-func (s *Authority) filterAuthorityAccountLite(res http.ResponseWriter, req *http.Request, filter *commonDef.Filter) {
+func (s *Authority) filterAuthorityAccountLite(ctx context.Context, res http.ResponseWriter, req *http.Request, filter *fu.ContentFilter) {
+	curSession := ctx.Value(commonSession.AuthSession).(commonSession.Session)
 	result := &casCommon.AccountLiteListResult{}
 	for {
-		curSession := s.sessionRegistry.GetSession(res, req)
-		curNamespace := s.getCurrentNamespace(res, req)
+		curNamespace := s.getCurrentNamespace(ctx, res, req)
 		filter.Remove("mode")
 
 		accountList, accountTotal, accountErr := s.bizPtr.FilterAuthorityAccountLite(curSession.GetSessionInfo(), filter, curNamespace)
@@ -38,20 +41,20 @@ func (s *Authority) filterAuthorityAccountLite(res http.ResponseWriter, req *htt
 	res.WriteHeader(http.StatusExpectationFailed)
 }
 
-func (s *Authority) FilterAuthorityAccount(res http.ResponseWriter, req *http.Request) {
-	filter := commonDef.NewFilter()
+func (s *Authority) FilterAuthorityAccount(ctx context.Context, res http.ResponseWriter, req *http.Request) {
+	filter := fu.NewFilter()
 	filter.Decode(req)
 
 	modelVal, modelOK := filter.Get("mode")
 	if modelOK && modelVal == "1" {
-		s.filterAuthorityAccountLite(res, req, filter)
+		s.filterAuthorityAccountLite(ctx, res, req, filter)
 		return
 	}
 
+	curSession := ctx.Value(commonSession.AuthSession).(commonSession.Session)
 	result := &casCommon.AccountStatisticResult{}
 	for {
-		curSession := s.sessionRegistry.GetSession(res, req)
-		curNamespace := s.getCurrentNamespace(res, req)
+		curNamespace := s.getCurrentNamespace(ctx, res, req)
 		accountList, accountTotal, accountErr := s.bizPtr.FilterAuthorityAccount(curSession.GetSessionInfo(), filter, curNamespace)
 		if accountErr != nil {
 			result.ErrorCode = commonDef.Failed
@@ -82,7 +85,8 @@ func (s *Authority) FilterAuthorityAccount(res http.ResponseWriter, req *http.Re
 	res.WriteHeader(http.StatusExpectationFailed)
 }
 
-func (s *Authority) QueryAuthorityAccount(res http.ResponseWriter, req *http.Request) {
+func (s *Authority) QueryAuthorityAccount(ctx context.Context, res http.ResponseWriter, req *http.Request) {
+	curSession := ctx.Value(commonSession.AuthSession).(commonSession.Session)
 	result := &casCommon.AccountResult{}
 	for {
 		id, err := fn.SplitRESTID(req.URL.Path)
@@ -92,8 +96,7 @@ func (s *Authority) QueryAuthorityAccount(res http.ResponseWriter, req *http.Req
 			break
 		}
 
-		curSession := s.sessionRegistry.GetSession(res, req)
-		curNamespace := s.getCurrentNamespace(res, req)
+		curNamespace := s.getCurrentNamespace(ctx, res, req)
 		accountPtr, accountErr := s.bizPtr.QueryAuthorityAccount(curSession.GetSessionInfo(), id, curNamespace)
 		if accountErr != nil {
 			result.ErrorCode = commonDef.Failed
@@ -115,7 +118,8 @@ func (s *Authority) QueryAuthorityAccount(res http.ResponseWriter, req *http.Req
 	res.WriteHeader(http.StatusExpectationFailed)
 }
 
-func (s *Authority) CreateAuthorityAccount(res http.ResponseWriter, req *http.Request) {
+func (s *Authority) CreateAuthorityAccount(ctx context.Context, res http.ResponseWriter, req *http.Request) {
+	curSession := ctx.Value(commonSession.AuthSession).(commonSession.Session)
 	result := &casCommon.AccountResult{}
 	for {
 		param := &casCommon.AccountParam{}
@@ -126,8 +130,7 @@ func (s *Authority) CreateAuthorityAccount(res http.ResponseWriter, req *http.Re
 			break
 		}
 
-		curSession := s.sessionRegistry.GetSession(res, req)
-		curNamespace := s.getCurrentNamespace(res, req)
+		curNamespace := s.getCurrentNamespace(ctx, res, req)
 		accountPtr, accountErr := s.bizPtr.CreateAuthorityAccount(curSession.GetSessionInfo(), param, curNamespace)
 		if accountErr != nil {
 			result.ErrorCode = commonDef.Failed
@@ -136,7 +139,7 @@ func (s *Authority) CreateAuthorityAccount(res http.ResponseWriter, req *http.Re
 		}
 
 		memo := fmt.Sprintf("新建Account:%s", accountPtr.Account)
-		s.writeLog(res, req, memo)
+		s.writeLog(ctx, res, req, memo)
 
 		result.Account = accountPtr
 		result.ErrorCode = commonDef.Success
@@ -152,7 +155,8 @@ func (s *Authority) CreateAuthorityAccount(res http.ResponseWriter, req *http.Re
 	res.WriteHeader(http.StatusExpectationFailed)
 }
 
-func (s *Authority) UpdateAuthorityAccount(res http.ResponseWriter, req *http.Request) {
+func (s *Authority) UpdateAuthorityAccount(ctx context.Context, res http.ResponseWriter, req *http.Request) {
+	curSession := ctx.Value(commonSession.AuthSession).(commonSession.Session)
 	result := &casCommon.AccountResult{}
 	for {
 		id, err := fn.SplitRESTID(req.URL.Path)
@@ -170,8 +174,7 @@ func (s *Authority) UpdateAuthorityAccount(res http.ResponseWriter, req *http.Re
 			break
 		}
 
-		curSession := s.sessionRegistry.GetSession(res, req)
-		curNamespace := s.getCurrentNamespace(res, req)
+		curNamespace := s.getCurrentNamespace(ctx, res, req)
 		accountPtr, accountErr := s.bizPtr.UpdateAuthorityAccount(curSession.GetSessionInfo(), id, param, curNamespace)
 		if accountErr != nil {
 			result.ErrorCode = commonDef.Failed
@@ -180,7 +183,7 @@ func (s *Authority) UpdateAuthorityAccount(res http.ResponseWriter, req *http.Re
 		}
 
 		memo := fmt.Sprintf("更新Account:%s", accountPtr.Account)
-		s.writeLog(res, req, memo)
+		s.writeLog(ctx, res, req, memo)
 
 		result.Account = accountPtr
 		result.ErrorCode = commonDef.Success
@@ -196,7 +199,8 @@ func (s *Authority) UpdateAuthorityAccount(res http.ResponseWriter, req *http.Re
 	res.WriteHeader(http.StatusExpectationFailed)
 }
 
-func (s *Authority) DeleteAuthorityAccount(res http.ResponseWriter, req *http.Request) {
+func (s *Authority) DeleteAuthorityAccount(ctx context.Context, res http.ResponseWriter, req *http.Request) {
+	curSession := ctx.Value(commonSession.AuthSession).(commonSession.Session)
 	result := &casCommon.AccountResult{}
 	for {
 		id, err := fn.SplitRESTID(req.URL.Path)
@@ -206,8 +210,7 @@ func (s *Authority) DeleteAuthorityAccount(res http.ResponseWriter, req *http.Re
 			break
 		}
 
-		curSession := s.sessionRegistry.GetSession(res, req)
-		curNamespace := s.getCurrentNamespace(res, req)
+		curNamespace := s.getCurrentNamespace(ctx, res, req)
 		accountPtr, accountErr := s.bizPtr.DeleteAuthorityAccount(curSession.GetSessionInfo(), id, curNamespace)
 		if accountErr != nil {
 			result.ErrorCode = commonDef.Failed
@@ -216,7 +219,7 @@ func (s *Authority) DeleteAuthorityAccount(res http.ResponseWriter, req *http.Re
 		}
 
 		memo := fmt.Sprintf("删除Account:%s", accountPtr.Account)
-		s.writeLog(res, req, memo)
+		s.writeLog(ctx, res, req, memo)
 
 		result.Account = accountPtr
 		result.ErrorCode = commonDef.Success

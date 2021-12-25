@@ -2,7 +2,7 @@ package biz
 
 import (
 	"fmt"
-	commonDef "github.com/muidea/magicCommon/def"
+	fu "github.com/muidea/magicCommon/foundation/util"
 	fileClient "github.com/muidea/magicFile/client"
 	fileCommon "github.com/muidea/magicFile/common"
 	fileModel "github.com/muidea/magicFile/model"
@@ -36,7 +36,7 @@ func New(
 	return ptr
 }
 
-func (s *Image) FilterImage(filter *commonDef.Filter, namespace string) (ret []*fileModel.FileDetail, total int64, err error) {
+func (s *Image) FilterImage(filter *fu.ContentFilter, namespace string) (ret []*fileModel.FileDetail, total int64, err error) {
 	clnt := fileClient.NewClient(s.fileService)
 	defer clnt.Release()
 

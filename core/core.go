@@ -1,27 +1,26 @@
 package core
 
 import (
+	"context"
 	"fmt"
-	"github.com/muidea/magicCommon/module"
-	"github.com/muidea/magicCommon/task"
 	"net"
 	"net/http"
 	"strings"
 
 	log "github.com/cihub/seelog"
 
-	"github.com/muidea/magicCommon/def"
 	"github.com/muidea/magicCommon/event"
+	fu "github.com/muidea/magicCommon/foundation/util"
+	"github.com/muidea/magicCommon/module"
 	"github.com/muidea/magicCommon/session"
+	"github.com/muidea/magicCommon/task"
 	engine "github.com/muidea/magicEngine"
 
 	casCommon "github.com/muidea/magicCas/common"
+	"github.com/muidea/magicCas/toolkit"
 
-	"github.com/muidea/magicDefault/assist/persistence"
-	"github.com/muidea/magicDefault/assist/registry"
 	"github.com/muidea/magicDefault/common"
 	"github.com/muidea/magicDefault/config"
-	"github.com/muidea/magicDefault/model"
 
 	_ "github.com/muidea/magicDefault/core/kernel/base"
 	_ "github.com/muidea/magicDefault/core/kernel/setting"
@@ -41,7 +40,7 @@ func (s *loadNamespaceTask) Run() {
 	header := event.NewValues()
 	header.Set("namespace", config.SuperNamespace())
 
-	filter := def.NewFilter()
+	filter := fu.NewFilter()
 	eventPtr := event.NewEvent(eid, "/", common.AuthorityModule, header, filter)
 	result := s.eventHub.Call(eventPtr)
 	resultVal, resultErr := result.Get()
@@ -62,18 +61,6 @@ func (s *loadNamespaceTask) Run() {
 
 // New 新建Core
 func New(endpointName, listenPort string) (ret *Core, err error) {
-	batisClnt, batisErr := persistence.GetBatisClient()
-	if batisErr != nil {
-		err = batisErr
-		return
-	}
-
-	err = model.InitializeModel(batisClnt)
-	if err != nil {
-		log.Errorf("initializeModel failed, err:%s", err.Error())
-		return
-	}
-
 	core := &Core{
 		endpointName: endpointName,
 		listenPort:   listenPort,
@@ -88,11 +75,8 @@ type Core struct {
 	endpointName string
 	listenPort   string
 
-	httpServer engine.HTTPServer
-}
-
-func (s *Core) Name() string {
-	return s.endpointName
+	sessionRegistry session.Registry
+	httpServer      engine.HTTPServer
 }
 
 // Startup 启动
@@ -100,14 +84,18 @@ func (s *Core) Startup(
 	eventHub event.Hub,
 	backgroundRoutine task.BackgroundRoutine) {
 	router := engine.NewRouter()
-	registry.New(s, s, s, router)
-
+	routeRegistry := toolkit.NewRouteRegistry(router)
+	casRegistry := toolkit.NewCasRegistry(s, router)
+	roleRegistry := toolkit.NewRoleRegistry(s, router)
 	s.httpServer = engine.NewHTTPServer(s.listenPort)
 	s.httpServer.Bind(router)
 
 	modules := module.GetModules()
 	for _, val := range modules {
-		val.Setup(s.endpointName, eventHub, backgroundRoutine)
+
+		module.BindRegistry(val, routeRegistry, casRegistry, roleRegistry)
+
+		module.Setup(val, s.endpointName, eventHub, backgroundRoutine)
 	}
 }
 
@@ -119,7 +107,7 @@ func (s *Core) Run() {
 func (s *Core) Shutdown() {
 	modules := module.GetModules()
 	for _, val := range modules {
-		val.Teardown()
+		module.Teardown(val)
 	}
 }
 
@@ -128,24 +116,71 @@ func (s *Core) OnTimeOut(session session.Session) {
 }
 
 // Verify verify current session
-func (s *Core) Verify(res http.ResponseWriter, req *http.Request) (err error) {
-	_, err = s.getCurrentEntity(res, req)
-	return
-}
-
-// VerifyRole verify current role
-func (s *Core) VerifyRole(res http.ResponseWriter, req *http.Request) (ret *casCommon.RoleView, err error) {
-	curRole, curErr := s.getCurrentRole(res, req)
-	if curErr != nil {
-		err = curErr
+func (s *Core) Verify(ctx context.Context, res http.ResponseWriter, req *http.Request) (ret *casCommon.EntityView, err error) {
+	curSession := ctx.Value(session.AuthSession).(session.Session)
+	namespaceVal, ok := curSession.GetOption(session.AuthNamespace)
+	if !ok {
+		err = fmt.Errorf("无效Namespace,请先登录")
 		return
 	}
 
-	ret = curRole
+	requestNamespace := s.getRequestNamespace(res, req)
+	if namespaceVal.(string) != requestNamespace {
+		log.Errorf("namespace mismatch, request namespace:%s, current namespace:%s", requestNamespace, namespaceVal.(string))
+		err = fmt.Errorf("无效Namespace,未通过验证")
+		return
+	}
+
+	authVal, ok := curSession.GetOption(session.AuthAccount)
+	if !ok {
+		err = fmt.Errorf("无效权限,未通过验证")
+		return
+	}
+
+	ret = authVal.(*casCommon.EntityView)
 	return
 }
 
-func (s *Core) getCurrentNamespace(res http.ResponseWriter, req *http.Request) (ret string) {
+func (s *Core) VerifyRole(ctx context.Context, res http.ResponseWriter, req *http.Request) (ret *casCommon.RoleView, err error) {
+	curSession := ctx.Value(session.AuthSession).(session.Session)
+	namespaceVal, ok := curSession.GetOption(session.AuthNamespace)
+	if !ok {
+		err = fmt.Errorf("无效Namespace,请先登录")
+		return
+	}
+
+	requestNamespace := s.getRequestNamespace(res, req)
+	if namespaceVal.(string) != requestNamespace {
+		log.Errorf("namespace mismatch, request namespace:%s, current namespace:%s", requestNamespace, namespaceVal.(string))
+		err = fmt.Errorf("无效Namespace,未通过验证")
+		return
+	}
+
+	roleVal, ok := curSession.GetOption(session.AuthRole)
+	if !ok {
+		err = fmt.Errorf("无效权限,未通过验证")
+		return
+	}
+
+	ret = roleVal.(*casCommon.RoleView)
+	return
+}
+
+func (s *Core) Handle(ctx engine.RequestContext, res http.ResponseWriter, req *http.Request) {
+	curSession := s.sessionRegistry.GetSession(res, req)
+
+	sessionInfo := curSession.GetSessionInfo()
+	sessionInfo.Scope = session.ShareSession
+
+	values := req.URL.Query()
+	values = sessionInfo.Encode(values)
+	req.URL.RawQuery = values.Encode()
+
+	ctx.Update(context.WithValue(ctx.Context(), session.AuthSession, curSession))
+	ctx.Next()
+}
+
+func (s *Core) getRequestNamespace(res http.ResponseWriter, req *http.Request) (ret string) {
 	namespace := req.Header.Get(casCommon.NamespaceID)
 	if namespace != "" {
 		ret = namespace
@@ -165,29 +200,5 @@ func (s *Core) getCurrentNamespace(res http.ResponseWriter, req *http.Request) (
 	}
 
 	ret = items[0]
-	return
-}
-
-func (s *Core) getCurrentEntity(res http.ResponseWriter, req *http.Request) (ret *casCommon.EntityView, err error) {
-	curSession := registry.GetSession(res, req)
-	authVal, ok := curSession.GetOption(session.AuthAccount)
-	if !ok {
-		err = fmt.Errorf("无效权限,未通过验证")
-		return
-	}
-
-	ret = authVal.(*casCommon.EntityView)
-	return
-}
-
-func (s *Core) getCurrentRole(res http.ResponseWriter, req *http.Request) (ret *casCommon.RoleView, err error) {
-	curSession := registry.GetSession(res, req)
-	authVal, ok := curSession.GetOption(session.AuthRole)
-	if !ok {
-		err = fmt.Errorf("无效权限,未通过验证")
-		return
-	}
-
-	ret = authVal.(*casCommon.RoleView)
 	return
 }

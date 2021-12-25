@@ -1,29 +1,29 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"net/http"
 	"strings"
 	"time"
 
+	casCommon "github.com/muidea/magicCas/common"
+	casToolkit "github.com/muidea/magicCas/toolkit"
 	fn "github.com/muidea/magicCommon/foundation/net"
 	fu "github.com/muidea/magicCommon/foundation/util"
 	commonSession "github.com/muidea/magicCommon/session"
-	engine "github.com/muidea/magicEngine"
-
-	casCommon "github.com/muidea/magicCas/common"
-	casToolkit "github.com/muidea/magicCas/toolkit"
 
 	"github.com/muidea/magicDefault/core/module/remoteHub/biz"
 	"github.com/muidea/magicDefault/model"
 )
 
 type RemoteHub struct {
-	sessionRegistry   commonSession.Registry
+	routeRegistry     casToolkit.RouteRegistry
 	casRouteRegistry  casToolkit.CasRegistry
 	roleRouteRegistry casToolkit.RoleRegistry
-	validator         fu.Validator
+
+	validator fu.Validator
 
 	bizPtr *biz.RemoteHub
 
@@ -44,35 +44,21 @@ func New(
 }
 
 func (s *RemoteHub) BindRegistry(
-	sessionRegistry commonSession.Registry,
+	routeRegistry casToolkit.RouteRegistry,
 	casRouteRegistry casToolkit.CasRegistry,
 	roleRouteRegistry casToolkit.RoleRegistry) {
 
-	s.sessionRegistry = sessionRegistry
+	s.routeRegistry = routeRegistry
 	s.casRouteRegistry = casRouteRegistry
 	s.roleRouteRegistry = roleRouteRegistry
-}
-
-// Handle middleware handler
-func (s *RemoteHub) Handle(ctx engine.RequestContext, res http.ResponseWriter, req *http.Request) {
-	curSession := s.sessionRegistry.GetSession(res, req)
-
-	sessionInfo := curSession.GetSessionInfo()
-	sessionInfo.Scope = commonSession.ShareSession
-
-	values := req.URL.Query()
-	values = sessionInfo.Encode(values)
-	req.URL.RawQuery = values.Encode()
-
-	ctx.Next()
 }
 
 // RegisterRoute 注册路由
 func (s *RemoteHub) RegisterRoute() {
 }
 
-func (s *RemoteHub) getCurrentEntity(res http.ResponseWriter, req *http.Request) (ret *casCommon.EntityView, err error) {
-	curSession := s.sessionRegistry.GetSession(res, req)
+func (s *RemoteHub) getCurrentEntity(ctx context.Context, res http.ResponseWriter, req *http.Request) (ret *casCommon.EntityView, err error) {
+	curSession := ctx.Value(commonSession.AuthSession).(commonSession.Session)
 	authVal, ok := curSession.GetOption(commonSession.AuthAccount)
 	if !ok {
 		err = fmt.Errorf("无效权限,未通过验证")
@@ -82,7 +68,7 @@ func (s *RemoteHub) getCurrentEntity(res http.ResponseWriter, req *http.Request)
 	return
 }
 
-func (s *RemoteHub) getCurrentNamespace(res http.ResponseWriter, req *http.Request) (ret string) {
+func (s *RemoteHub) getCurrentNamespace(ctx context.Context, res http.ResponseWriter, req *http.Request) (ret string) {
 	namespace := req.Header.Get(casCommon.NamespaceID)
 	if namespace != "" {
 		ret = namespace
@@ -110,10 +96,10 @@ func (s *RemoteHub) queryEntity(sessionInfo *commonSession.SessionInfo, id int, 
 	return
 }
 
-func (s *RemoteHub) writeLog(res http.ResponseWriter, req *http.Request, memo string) {
+func (s *RemoteHub) writeLog(ctx context.Context, res http.ResponseWriter, req *http.Request, memo string) {
 	address := fn.GetHTTPRemoteAddress(req)
-	curEntity, _ := s.getCurrentEntity(res, req)
-	curNamespace := s.getCurrentNamespace(res, req)
+	curEntity, _ := s.getCurrentEntity(ctx, res, req)
+	curNamespace := s.getCurrentNamespace(ctx, res, req)
 	logPtr := &model.Log{Address: address, Memo: memo, Creater: curEntity.ID, CreateTime: time.Now().UTC().Unix()}
 	s.bizPtr.WriteLog(logPtr, curNamespace)
 }

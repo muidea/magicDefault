@@ -4,11 +4,11 @@ go 1.14
 
 require (
 	github.com/cihub/seelog v0.0.0-20170130134532-f561c5e57575
-	github.com/muidea/magicBatis v0.0.0-20211122100040-0b721d7ec8d4
-	github.com/muidea/magicCas v0.0.0-20211122135707-b338e45fa2eb
-	github.com/muidea/magicCommon v0.0.0-20211218105941-8e80e4fce363
-	github.com/muidea/magicEngine v0.0.0-20211011141410-5418acb3657d
-	github.com/muidea/magicFile v0.0.0-20211113145631-ed5fbd34bae9
+	github.com/muidea/magicBatis v0.0.0-20211222153828-c11be3c57b82
+	github.com/muidea/magicCas v0.0.0-20211225064414-9193a35eaaff
+	github.com/muidea/magicCommon v0.0.0-20211223103203-25165e21c59a
+	github.com/muidea/magicEngine v0.0.0-20211219074645-49a3a434d25e
+	github.com/muidea/magicFile v0.0.0-20211225064802-f0e94b05f56f
 	golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3 // indirect
 	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
 )

@@ -201,7 +201,7 @@ func (s *Base) QueryEntity(curSessionInfo *session.SessionInfo, id int, namespac
 	return clnt.QueryAccessEntity(id)
 }
 
-func (s *Base) QueryAccessLog(curSessionInfo *session.SessionInfo, entityPtr *casCommon.EntityView, filter *fu.PageFilter, namespace string) (ret []*casCommon.LogView, total int64, err error) {
+func (s *Base) QueryAccessLog(curSessionInfo *session.SessionInfo, entityPtr *casCommon.EntityView, filter *fu.Pagination, namespace string) (ret []*casCommon.LogView, total int64, err error) {
 	clnt := casClient.NewClient(s.casService)
 	defer clnt.Release()
 

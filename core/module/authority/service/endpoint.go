@@ -1,19 +1,22 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	casCommon "github.com/muidea/magicCas/common"
 	commonDef "github.com/muidea/magicCommon/def"
 	fn "github.com/muidea/magicCommon/foundation/net"
+	fu "github.com/muidea/magicCommon/foundation/util"
+	commonSession "github.com/muidea/magicCommon/session"
 	"net/http"
 )
 
-func (s *Authority) filterAuthorityEndpointLite(res http.ResponseWriter, req *http.Request, filter *commonDef.Filter) {
+func (s *Authority) filterAuthorityEndpointLite(ctx context.Context, res http.ResponseWriter, req *http.Request, filter *fu.ContentFilter) {
+	curSession := ctx.Value(commonSession.AuthSession).(commonSession.Session)
 	result := &casCommon.EndpointLiteListResult{}
 	for {
-		curSession := s.sessionRegistry.GetSession(res, req)
-		curNamespace := s.getCurrentNamespace(res, req)
+		curNamespace := s.getCurrentNamespace(ctx, res, req)
 		endpointList, _, endpointErr := s.bizPtr.FilterAuthorityEndpointLite(curSession.GetSessionInfo(), filter, curNamespace)
 		if endpointErr != nil {
 			result.ErrorCode = commonDef.Failed
@@ -35,20 +38,20 @@ func (s *Authority) filterAuthorityEndpointLite(res http.ResponseWriter, req *ht
 	res.WriteHeader(http.StatusExpectationFailed)
 }
 
-func (s *Authority) FilterAuthorityEndpoint(res http.ResponseWriter, req *http.Request) {
-	filter := commonDef.NewFilter()
+func (s *Authority) FilterAuthorityEndpoint(ctx context.Context, res http.ResponseWriter, req *http.Request) {
+	filter := fu.NewFilter()
 	filter.Decode(req)
 
 	modelVal, modelOK := filter.Get("mode")
 	if modelOK && modelVal == "1" {
-		s.filterAuthorityEndpointLite(res, req, filter)
+		s.filterAuthorityEndpointLite(ctx, res, req, filter)
 		return
 	}
 
+	curSession := ctx.Value(commonSession.AuthSession).(commonSession.Session)
 	result := &casCommon.EndpointStatisticResult{}
 	for {
-		curSession := s.sessionRegistry.GetSession(res, req)
-		curNamespace := s.getCurrentNamespace(res, req)
+		curNamespace := s.getCurrentNamespace(ctx, res, req)
 		endpointList, endpointTotal, endpointErr := s.bizPtr.FilterAuthorityEndpoint(curSession.GetSessionInfo(), filter, curNamespace)
 		if endpointErr != nil {
 			result.ErrorCode = commonDef.Failed
@@ -79,7 +82,8 @@ func (s *Authority) FilterAuthorityEndpoint(res http.ResponseWriter, req *http.R
 	res.WriteHeader(http.StatusExpectationFailed)
 }
 
-func (s *Authority) QueryAuthorityEndpoint(res http.ResponseWriter, req *http.Request) {
+func (s *Authority) QueryAuthorityEndpoint(ctx context.Context, res http.ResponseWriter, req *http.Request) {
+	curSession := ctx.Value(commonSession.AuthSession).(commonSession.Session)
 	result := &casCommon.EndpointResult{}
 	for {
 		id, err := fn.SplitRESTID(req.URL.Path)
@@ -89,8 +93,7 @@ func (s *Authority) QueryAuthorityEndpoint(res http.ResponseWriter, req *http.Re
 			break
 		}
 
-		curSession := s.sessionRegistry.GetSession(res, req)
-		curNamespace := s.getCurrentNamespace(res, req)
+		curNamespace := s.getCurrentNamespace(ctx, res, req)
 		endpointPtr, endpointErr := s.bizPtr.QueryAuthorityEndpoint(curSession.GetSessionInfo(), id, curNamespace)
 		if endpointErr != nil {
 			result.ErrorCode = commonDef.Failed
@@ -112,7 +115,8 @@ func (s *Authority) QueryAuthorityEndpoint(res http.ResponseWriter, req *http.Re
 	res.WriteHeader(http.StatusExpectationFailed)
 }
 
-func (s *Authority) CreateAuthorityEndpoint(res http.ResponseWriter, req *http.Request) {
+func (s *Authority) CreateAuthorityEndpoint(ctx context.Context, res http.ResponseWriter, req *http.Request) {
+	curSession := ctx.Value(commonSession.AuthSession).(commonSession.Session)
 	result := &casCommon.EndpointResult{}
 	for {
 		param := &casCommon.EndpointParam{}
@@ -123,8 +127,7 @@ func (s *Authority) CreateAuthorityEndpoint(res http.ResponseWriter, req *http.R
 			break
 		}
 
-		curSession := s.sessionRegistry.GetSession(res, req)
-		curNamespace := s.getCurrentNamespace(res, req)
+		curNamespace := s.getCurrentNamespace(ctx, res, req)
 		endpointPtr, endpointErr := s.bizPtr.CreateAuthorityEndpoint(curSession.GetSessionInfo(), param, curNamespace)
 		if endpointErr != nil {
 			result.ErrorCode = commonDef.Failed
@@ -133,7 +136,7 @@ func (s *Authority) CreateAuthorityEndpoint(res http.ResponseWriter, req *http.R
 		}
 
 		memo := fmt.Sprintf("新建Endpoint:%s", endpointPtr.Endpoint)
-		s.writeLog(res, req, memo)
+		s.writeLog(ctx, res, req, memo)
 
 		result.Endpoint = endpointPtr
 		result.ErrorCode = commonDef.Success
@@ -149,7 +152,8 @@ func (s *Authority) CreateAuthorityEndpoint(res http.ResponseWriter, req *http.R
 	res.WriteHeader(http.StatusExpectationFailed)
 }
 
-func (s *Authority) UpdateAuthorityEndpoint(res http.ResponseWriter, req *http.Request) {
+func (s *Authority) UpdateAuthorityEndpoint(ctx context.Context, res http.ResponseWriter, req *http.Request) {
+	curSession := ctx.Value(commonSession.AuthSession).(commonSession.Session)
 	result := &casCommon.EndpointResult{}
 	for {
 		id, err := fn.SplitRESTID(req.URL.Path)
@@ -167,8 +171,7 @@ func (s *Authority) UpdateAuthorityEndpoint(res http.ResponseWriter, req *http.R
 			break
 		}
 
-		curSession := s.sessionRegistry.GetSession(res, req)
-		curNamespace := s.getCurrentNamespace(res, req)
+		curNamespace := s.getCurrentNamespace(ctx, res, req)
 		endpointPtr, endpointErr := s.bizPtr.UpdateAuthorityEndpoint(curSession.GetSessionInfo(), id, param, curNamespace)
 		if endpointErr != nil {
 			result.ErrorCode = commonDef.Failed
@@ -177,7 +180,7 @@ func (s *Authority) UpdateAuthorityEndpoint(res http.ResponseWriter, req *http.R
 		}
 
 		memo := fmt.Sprintf("更新Endpoint:%s", endpointPtr.Endpoint)
-		s.writeLog(res, req, memo)
+		s.writeLog(ctx, res, req, memo)
 
 		result.Endpoint = endpointPtr
 		result.ErrorCode = commonDef.Success
@@ -193,7 +196,8 @@ func (s *Authority) UpdateAuthorityEndpoint(res http.ResponseWriter, req *http.R
 	res.WriteHeader(http.StatusExpectationFailed)
 }
 
-func (s *Authority) DeleteAuthorityEndpoint(res http.ResponseWriter, req *http.Request) {
+func (s *Authority) DeleteAuthorityEndpoint(ctx context.Context, res http.ResponseWriter, req *http.Request) {
+	curSession := ctx.Value(commonSession.AuthSession).(commonSession.Session)
 	result := &casCommon.EndpointResult{}
 	for {
 		id, err := fn.SplitRESTID(req.URL.Path)
@@ -203,8 +207,7 @@ func (s *Authority) DeleteAuthorityEndpoint(res http.ResponseWriter, req *http.R
 			break
 		}
 
-		curSession := s.sessionRegistry.GetSession(res, req)
-		curNamespace := s.getCurrentNamespace(res, req)
+		curNamespace := s.getCurrentNamespace(ctx, res, req)
 		endpointPtr, endpointErr := s.bizPtr.DeleteAuthorityEndpoint(curSession.GetSessionInfo(), id, curNamespace)
 		if endpointErr != nil {
 			result.ErrorCode = commonDef.Failed
@@ -213,7 +216,7 @@ func (s *Authority) DeleteAuthorityEndpoint(res http.ResponseWriter, req *http.R
 		}
 
 		memo := fmt.Sprintf("删除Endpoint:%s", endpointPtr.Endpoint)
-		s.writeLog(res, req, memo)
+		s.writeLog(ctx, res, req, memo)
 
 		result.Endpoint = endpointPtr
 		result.ErrorCode = commonDef.Success

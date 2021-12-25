@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"github.com/muidea/magicDefault/core/module/authority/biz"
 	"github.com/muidea/magicDefault/model"
@@ -12,20 +13,19 @@ import (
 	fn "github.com/muidea/magicCommon/foundation/net"
 	fu "github.com/muidea/magicCommon/foundation/util"
 
-	commonSession "github.com/muidea/magicCommon/session"
-	engine "github.com/muidea/magicEngine"
-
 	casCommon "github.com/muidea/magicCas/common"
 	casToolkit "github.com/muidea/magicCas/toolkit"
+	commonSession "github.com/muidea/magicCommon/session"
 
 	"github.com/muidea/magicDefault/common"
 )
 
 type Authority struct {
-	sessionRegistry   commonSession.Registry
+	routeRegistry     casToolkit.RouteRegistry
 	casRouteRegistry  casToolkit.CasRegistry
 	roleRouteRegistry casToolkit.RoleRegistry
-	validator         fu.Validator
+
+	validator fu.Validator
 
 	bizPtr *biz.Authority
 }
@@ -42,27 +42,13 @@ func New(
 }
 
 func (s *Authority) BindRegistry(
-	sessionRegistry commonSession.Registry,
+	routeRegistry casToolkit.RouteRegistry,
 	casRouteRegistry casToolkit.CasRegistry,
 	roleRouteRegistry casToolkit.RoleRegistry) {
 
-	s.sessionRegistry = sessionRegistry
+	s.routeRegistry = routeRegistry
 	s.casRouteRegistry = casRouteRegistry
 	s.roleRouteRegistry = roleRouteRegistry
-}
-
-// Handle middleware handler
-func (s *Authority) Handle(ctx engine.RequestContext, res http.ResponseWriter, req *http.Request) {
-	curSession := s.sessionRegistry.GetSession(res, req)
-
-	sessionInfo := curSession.GetSessionInfo()
-	sessionInfo.Scope = commonSession.ShareSession
-
-	values := req.URL.Query()
-	values = sessionInfo.Encode(values)
-	req.URL.RawQuery = values.Encode()
-
-	ctx.Next()
 }
 
 // RegisterRoute 注册路由
@@ -92,8 +78,8 @@ func (s *Authority) RegisterRoute() {
 	s.roleRouteRegistry.AddHandler(common.DeleteAuthorityNamespace, "DELETE", casCommon.DeletePrivate, s.DeleteAuthorityNamespace)
 }
 
-func (s *Authority) getCurrentEntity(res http.ResponseWriter, req *http.Request) (ret *casCommon.EntityView, err error) {
-	curSession := s.sessionRegistry.GetSession(res, req)
+func (s *Authority) getCurrentEntity(ctx context.Context, res http.ResponseWriter, req *http.Request) (ret *casCommon.EntityView, err error) {
+	curSession := ctx.Value(commonSession.AuthSession).(commonSession.Session)
 	authVal, ok := curSession.GetOption(commonSession.AuthAccount)
 	if !ok {
 		err = fmt.Errorf("无效权限,未通过验证")
@@ -103,7 +89,7 @@ func (s *Authority) getCurrentEntity(res http.ResponseWriter, req *http.Request)
 	return
 }
 
-func (s *Authority) getCurrentNamespace(res http.ResponseWriter, req *http.Request) (ret string) {
+func (s *Authority) getCurrentNamespace(ctx context.Context, res http.ResponseWriter, req *http.Request) (ret string) {
 	namespace := req.Header.Get(casCommon.NamespaceID)
 	if namespace != "" {
 		ret = namespace
@@ -131,10 +117,10 @@ func (s *Authority) queryEntity(sessionInfo *commonSession.SessionInfo, id int, 
 	return
 }
 
-func (s *Authority) writeLog(res http.ResponseWriter, req *http.Request, memo string) {
+func (s *Authority) writeLog(ctx context.Context, res http.ResponseWriter, req *http.Request, memo string) {
 	address := fn.GetHTTPRemoteAddress(req)
-	curEntity, _ := s.getCurrentEntity(res, req)
-	curNamespace := s.getCurrentNamespace(res, req)
+	curEntity, _ := s.getCurrentEntity(ctx, res, req)
+	curNamespace := s.getCurrentNamespace(ctx, res, req)
 	logPtr := &model.Log{Address: address, Memo: memo, Creater: curEntity.ID, CreateTime: time.Now().UTC().Unix()}
 	s.bizPtr.WriteLog(logPtr, curNamespace)
 }

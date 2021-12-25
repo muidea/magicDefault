@@ -1,19 +1,22 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	casCommon "github.com/muidea/magicCas/common"
 	commonDef "github.com/muidea/magicCommon/def"
 	fn "github.com/muidea/magicCommon/foundation/net"
+	fu "github.com/muidea/magicCommon/foundation/util"
+	commonSession "github.com/muidea/magicCommon/session"
 	"net/http"
 )
 
-func (s *Authority) filterAuthorityRoleLite(res http.ResponseWriter, req *http.Request, filter *commonDef.Filter) {
+func (s *Authority) filterAuthorityRoleLite(ctx context.Context, res http.ResponseWriter, req *http.Request, filter *fu.ContentFilter) {
+	curSession := ctx.Value(commonSession.AuthSession).(commonSession.Session)
 	result := &casCommon.RoleLiteListResult{}
 	for {
-		curSession := s.sessionRegistry.GetSession(res, req)
-		curNamespace := s.getCurrentNamespace(res, req)
+		curNamespace := s.getCurrentNamespace(ctx, res, req)
 		roleList, _, roleErr := s.bizPtr.FilterAuthorityRoleLite(curSession.GetSessionInfo(), filter, curNamespace)
 		if roleErr != nil {
 			result.ErrorCode = commonDef.Failed
@@ -35,20 +38,20 @@ func (s *Authority) filterAuthorityRoleLite(res http.ResponseWriter, req *http.R
 	res.WriteHeader(http.StatusExpectationFailed)
 }
 
-func (s *Authority) FilterAuthorityRole(res http.ResponseWriter, req *http.Request) {
-	filter := commonDef.NewFilter()
+func (s *Authority) FilterAuthorityRole(ctx context.Context, res http.ResponseWriter, req *http.Request) {
+	filter := fu.NewFilter()
 	filter.Decode(req)
 
 	modelVal, modelOK := filter.Get("mode")
 	if modelOK && modelVal == "1" {
-		s.filterAuthorityRoleLite(res, req, filter)
+		s.filterAuthorityRoleLite(ctx, res, req, filter)
 		return
 	}
 
+	curSession := ctx.Value(commonSession.AuthSession).(commonSession.Session)
 	result := &casCommon.RoleStatisticResult{}
 	for {
-		curSession := s.sessionRegistry.GetSession(res, req)
-		curNamespace := s.getCurrentNamespace(res, req)
+		curNamespace := s.getCurrentNamespace(ctx, res, req)
 		roleList, roleTotal, roleErr := s.bizPtr.FilterAuthorityRole(curSession.GetSessionInfo(), filter, curNamespace)
 		if roleErr != nil {
 			result.ErrorCode = commonDef.Failed
@@ -71,7 +74,8 @@ func (s *Authority) FilterAuthorityRole(res http.ResponseWriter, req *http.Reque
 	res.WriteHeader(http.StatusExpectationFailed)
 }
 
-func (s *Authority) QueryAuthorityRole(res http.ResponseWriter, req *http.Request) {
+func (s *Authority) QueryAuthorityRole(ctx context.Context, res http.ResponseWriter, req *http.Request) {
+	curSession := ctx.Value(commonSession.AuthSession).(commonSession.Session)
 	result := &casCommon.RoleResult{}
 	for {
 		id, err := fn.SplitRESTID(req.URL.Path)
@@ -81,8 +85,7 @@ func (s *Authority) QueryAuthorityRole(res http.ResponseWriter, req *http.Reques
 			break
 		}
 
-		curSession := s.sessionRegistry.GetSession(res, req)
-		curNamespace := s.getCurrentNamespace(res, req)
+		curNamespace := s.getCurrentNamespace(ctx, res, req)
 		rolePtr, roleErr := s.bizPtr.QueryAuthorityRole(curSession.GetSessionInfo(), id, curNamespace)
 		if roleErr != nil {
 			result.ErrorCode = commonDef.Failed
@@ -104,7 +107,8 @@ func (s *Authority) QueryAuthorityRole(res http.ResponseWriter, req *http.Reques
 	res.WriteHeader(http.StatusExpectationFailed)
 }
 
-func (s *Authority) CreateAuthorityRole(res http.ResponseWriter, req *http.Request) {
+func (s *Authority) CreateAuthorityRole(ctx context.Context, res http.ResponseWriter, req *http.Request) {
+	curSession := ctx.Value(commonSession.AuthSession).(commonSession.Session)
 	result := &casCommon.RoleResult{}
 	for {
 		param := &casCommon.RoleParam{}
@@ -115,8 +119,7 @@ func (s *Authority) CreateAuthorityRole(res http.ResponseWriter, req *http.Reque
 			break
 		}
 
-		curSession := s.sessionRegistry.GetSession(res, req)
-		curNamespace := s.getCurrentNamespace(res, req)
+		curNamespace := s.getCurrentNamespace(ctx, res, req)
 		rolePtr, roleErr := s.bizPtr.CreateAuthorityRole(curSession.GetSessionInfo(), param, curNamespace)
 		if roleErr != nil {
 			result.ErrorCode = commonDef.Failed
@@ -125,7 +128,7 @@ func (s *Authority) CreateAuthorityRole(res http.ResponseWriter, req *http.Reque
 		}
 
 		memo := fmt.Sprintf("新建Role:%s", rolePtr.Name)
-		s.writeLog(res, req, memo)
+		s.writeLog(ctx, res, req, memo)
 
 		result.Role = rolePtr
 		result.ErrorCode = commonDef.Success
@@ -141,7 +144,8 @@ func (s *Authority) CreateAuthorityRole(res http.ResponseWriter, req *http.Reque
 	res.WriteHeader(http.StatusExpectationFailed)
 }
 
-func (s *Authority) UpdateAuthorityRole(res http.ResponseWriter, req *http.Request) {
+func (s *Authority) UpdateAuthorityRole(ctx context.Context, res http.ResponseWriter, req *http.Request) {
+	curSession := ctx.Value(commonSession.AuthSession).(commonSession.Session)
 	result := &casCommon.RoleResult{}
 	for {
 		id, err := fn.SplitRESTID(req.URL.Path)
@@ -159,8 +163,7 @@ func (s *Authority) UpdateAuthorityRole(res http.ResponseWriter, req *http.Reque
 			break
 		}
 
-		curSession := s.sessionRegistry.GetSession(res, req)
-		curNamespace := s.getCurrentNamespace(res, req)
+		curNamespace := s.getCurrentNamespace(ctx, res, req)
 		rolePtr, roleErr := s.bizPtr.UpdateAuthorityRole(curSession.GetSessionInfo(), id, param, curNamespace)
 		if roleErr != nil {
 			result.ErrorCode = commonDef.Failed
@@ -169,7 +172,7 @@ func (s *Authority) UpdateAuthorityRole(res http.ResponseWriter, req *http.Reque
 		}
 
 		memo := fmt.Sprintf("更新Role:%s", rolePtr.Name)
-		s.writeLog(res, req, memo)
+		s.writeLog(ctx, res, req, memo)
 
 		result.Role = rolePtr
 		result.ErrorCode = commonDef.Success
@@ -185,7 +188,8 @@ func (s *Authority) UpdateAuthorityRole(res http.ResponseWriter, req *http.Reque
 	res.WriteHeader(http.StatusExpectationFailed)
 }
 
-func (s *Authority) DeleteAuthorityRole(res http.ResponseWriter, req *http.Request) {
+func (s *Authority) DeleteAuthorityRole(ctx context.Context, res http.ResponseWriter, req *http.Request) {
+	curSession := ctx.Value(commonSession.AuthSession).(commonSession.Session)
 	result := &casCommon.RoleResult{}
 	for {
 		id, err := fn.SplitRESTID(req.URL.Path)
@@ -195,8 +199,7 @@ func (s *Authority) DeleteAuthorityRole(res http.ResponseWriter, req *http.Reque
 			break
 		}
 
-		curSession := s.sessionRegistry.GetSession(res, req)
-		curNamespace := s.getCurrentNamespace(res, req)
+		curNamespace := s.getCurrentNamespace(ctx, res, req)
 		rolePtr, roleErr := s.bizPtr.DeleteAuthorityRole(curSession.GetSessionInfo(), id, curNamespace)
 		if roleErr != nil {
 			result.ErrorCode = commonDef.Failed
@@ -205,7 +208,7 @@ func (s *Authority) DeleteAuthorityRole(res http.ResponseWriter, req *http.Reque
 		}
 
 		memo := fmt.Sprintf("删除Role:%s", rolePtr.Name)
-		s.writeLog(res, req, memo)
+		s.writeLog(ctx, res, req, memo)
 
 		result.Role = rolePtr
 		result.ErrorCode = commonDef.Success

@@ -2,13 +2,13 @@ package biz
 
 import (
 	casCommon "github.com/muidea/magicCas/common"
-	commonDef "github.com/muidea/magicCommon/def"
+	fu "github.com/muidea/magicCommon/foundation/util"
 	commonSession "github.com/muidea/magicCommon/session"
 
 	casClient "github.com/muidea/magicCas/client"
 )
 
-func (s *Authority) FilterAuthorityNamespace(sessionInfo *commonSession.SessionInfo, filter *commonDef.Filter, namespace string) (ret []*casCommon.NamespaceView, total int64, err error) {
+func (s *Authority) FilterAuthorityNamespace(sessionInfo *commonSession.SessionInfo, filter *fu.ContentFilter, namespace string) (ret []*casCommon.NamespaceView, total int64, err error) {
 	clnt := casClient.NewClient(s.casService)
 	defer clnt.Release()
 
@@ -19,7 +19,7 @@ func (s *Authority) FilterAuthorityNamespace(sessionInfo *commonSession.SessionI
 	return
 }
 
-func (s *Authority) FilterAuthorityNamespaceLite(sessionInfo *commonSession.SessionInfo, filter *commonDef.Filter, namespace string) (ret []*casCommon.NamespaceLite, total int64, err error) {
+func (s *Authority) FilterAuthorityNamespaceLite(sessionInfo *commonSession.SessionInfo, filter *fu.ContentFilter, namespace string) (ret []*casCommon.NamespaceLite, total int64, err error) {
 	clnt := casClient.NewClient(s.casService)
 	defer clnt.Release()
 

@@ -1,7 +1,9 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
+	commonSession "github.com/muidea/magicCommon/session"
 	"net/http"
 
 	bc "github.com/muidea/magicBatis/common"
@@ -12,18 +14,18 @@ import (
 	"github.com/muidea/magicDefault/common"
 )
 
-func (s *Setting) ViewSettingProfile(res http.ResponseWriter, req *http.Request) {
-	pageFilter := fu.NewPageFilter()
-	pageFilter.Decode(req)
+func (s *Setting) ViewSettingProfile(ctx context.Context, res http.ResponseWriter, req *http.Request) {
+	curSession := ctx.Value(commonSession.AuthSession).(commonSession.Session)
+	filter := fu.NewFilter()
+	filter.Decode(req)
 
-	filter := bc.NewFilter()
-	filter.Page(pageFilter)
+	queryFilter := bc.NewFilter()
+	queryFilter.Page(filter.Pagination)
 
 	result := &common.ProfileResult{}
 	for {
-		curSession := s.sessionRegistry.GetSession(res, req)
-		curNamespace := s.getCurrentNamespace(res, req)
-		curEntity, curErr := s.getCurrentEntity(res, req)
+		curNamespace := s.getCurrentNamespace(ctx, res, req)
+		curEntity, curErr := s.getCurrentEntity(ctx, res, req)
 		if curErr != nil {
 			result.ErrorCode = commonDef.InvalidAuthority
 			result.Reason = "invalid authority"
@@ -37,8 +39,8 @@ func (s *Setting) ViewSettingProfile(res http.ResponseWriter, req *http.Request)
 			break
 		}
 
-		filter.Equal("Creater", curEntity.ID)
-		logList, logErr := s.settingBiz.QueryOperateLog(curSession.GetSessionInfo(), filter, curNamespace)
+		queryFilter.Equal("Creater", curEntity.ID)
+		logList, logErr := s.settingBiz.QueryOperateLog(curSession.GetSessionInfo(), queryFilter, curNamespace)
 		if logErr != nil {
 			result.ErrorCode = commonDef.Failed
 			result.Reason = logErr.Error()

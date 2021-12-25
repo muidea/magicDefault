@@ -1,14 +1,14 @@
 package biz
 
 import (
-	commonDef "github.com/muidea/magicCommon/def"
+	fu "github.com/muidea/magicCommon/foundation/util"
 	commonSession "github.com/muidea/magicCommon/session"
 
 	casClient "github.com/muidea/magicCas/client"
 	casCommon "github.com/muidea/magicCas/common"
 )
 
-func (s *Authority) FilterAuthorityAccount(sessionInfo *commonSession.SessionInfo, filter *commonDef.Filter, namespace string) (ret []*casCommon.AccountView, total int64, err error) {
+func (s *Authority) FilterAuthorityAccount(sessionInfo *commonSession.SessionInfo, filter *fu.ContentFilter, namespace string) (ret []*casCommon.AccountView, total int64, err error) {
 	clnt := casClient.NewClient(s.casService)
 	defer clnt.Release()
 
@@ -19,7 +19,7 @@ func (s *Authority) FilterAuthorityAccount(sessionInfo *commonSession.SessionInf
 	return
 }
 
-func (s *Authority) FilterAuthorityAccountLite(sessionInfo *commonSession.SessionInfo, filter *commonDef.Filter, namespace string) (ret []*casCommon.AccountLite, total int64, err error) {
+func (s *Authority) FilterAuthorityAccountLite(sessionInfo *commonSession.SessionInfo, filter *fu.ContentFilter, namespace string) (ret []*casCommon.AccountLite, total int64, err error) {
 	clnt := casClient.NewClient(s.casService)
 	defer clnt.Release()
 

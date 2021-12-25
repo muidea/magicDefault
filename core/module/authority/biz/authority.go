@@ -1,9 +1,9 @@
 package biz
 
 import (
-	"github.com/muidea/magicCommon/def"
 	"github.com/muidea/magicCommon/event"
 	fn "github.com/muidea/magicCommon/foundation/net"
+	fu "github.com/muidea/magicCommon/foundation/util"
 	"github.com/muidea/magicCommon/session"
 	"github.com/muidea/magicCommon/task"
 
@@ -46,7 +46,7 @@ func (s *Authority) Notify(event event.Event, result event.Result) {
 		sessionInfo = val.(*session.SessionInfo)
 	}
 	if event.Match(common.LoadAuthorityNamespace) {
-		filter, ok := event.Data().(*def.Filter)
+		filter, ok := event.Data().(*fu.ContentFilter)
 		if !ok {
 			return
 		}
@@ -61,7 +61,7 @@ func (s *Authority) Notify(event event.Event, result event.Result) {
 		return
 	}
 	if event.Match(common.FilterAuthorityNamespace) {
-		filter, ok := event.Data().(*def.Filter)
+		filter, ok := event.Data().(*fu.ContentFilter)
 		if !ok {
 			return
 		}
