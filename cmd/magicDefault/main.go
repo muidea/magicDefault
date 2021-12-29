@@ -3,16 +3,17 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/muidea/magicCommon/application"
 	"net/http"
 	_ "net/http/pprof"
 
 	log "github.com/cihub/seelog"
 
+	"github.com/muidea/magicCommon/application"
+
 	"github.com/muidea/magicDefault/core"
 )
 
-var listenPort = "8890"
+var listenPort = "8080"
 var endpointName = "magicDefault"
 
 func initPprofMonitor(listenPort string) error {

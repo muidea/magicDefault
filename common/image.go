@@ -1,8 +1,8 @@
 package common
 
 import (
-	commonDef "github.com/muidea/magicCommon/def"
-	fileCommon "github.com/muidea/magicFile/common"
+	cd "github.com/muidea/magicCommon/def"
+	fc "github.com/muidea/magicFile/common"
 )
 
 const (
@@ -15,14 +15,14 @@ const (
 const ImageModule = "/module/image"
 
 type ImageResult struct {
-	commonDef.Result
-	Image *fileCommon.FileView `json:"image"`
+	cd.Result
+	Image *fc.FileView `json:"image"`
 }
 
 type ImageListResult struct {
-	commonDef.Result
-	Total int64                  `json:"total"`
-	Image []*fileCommon.FileView `json:"image"`
+	cd.Result
+	Total int64          `json:"total"`
+	Image []*fc.FileView `json:"image"`
 }
 
 type ImageStatisticResult struct {

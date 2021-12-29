@@ -1,7 +1,6 @@
 package persistence
 
 import (
-	"flag"
 	"fmt"
 	"sync"
 
@@ -9,38 +8,23 @@ import (
 
 	"github.com/muidea/magicBatis/client"
 	bc "github.com/muidea/magicBatis/common"
+	"github.com/muidea/magicDefault/config"
 )
 
 var batisInitializeOnce sync.Once
 var batisUninitializeOnce sync.Once
 var batisClient client.Client
 
-var databaseServer = ""
-var databaseName = "magicdefault_db"
-var databaseUsername = "magicdefault"
-var databasePassword = "magicdefault"
-var maxConnNum = 10
-var batisService = "http://localhost:8080"
-
-func init() {
-	flag.StringVar(&databaseServer, "DBServer", databaseServer, "database server address.")
-	flag.StringVar(&databaseName, "DBName", databaseName, "database name.")
-	flag.StringVar(&databaseUsername, "DBUsername", databaseUsername, "database username.")
-	flag.StringVar(&databasePassword, "DBPassword", databasePassword, "database password.")
-	flag.IntVar(&maxConnNum, "MaxConnNum", maxConnNum, "max connection number.")
-	flag.StringVar(&batisService, "BatisService", batisService, "magicBatis service address.")
-}
-
 func Initialize(endpointName string) (err error) {
 	batisInitializeOnce.Do(func() {
-		clnt := client.NewClient(batisService, endpointName)
+		clnt := client.NewClient(config.BatisService(), endpointName)
 
 		servicePtr := bc.NewService(
-			databaseServer,
-			databaseName,
-			databaseUsername,
-			databasePassword,
-			maxConnNum,
+			config.DatabaseServer(),
+			config.DatabaseName(),
+			config.DatabaseUsername(),
+			config.DatabaseUserPassword(),
+			config.DatabaseMaxConnection(),
 		)
 		err = clnt.RegisterService(servicePtr)
 		if err != nil {

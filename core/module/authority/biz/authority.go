@@ -7,7 +7,7 @@ import (
 	"github.com/muidea/magicCommon/session"
 	"github.com/muidea/magicCommon/task"
 
-	casCommon "github.com/muidea/magicCas/common"
+	cc "github.com/muidea/magicCas/common"
 
 	"github.com/muidea/magicDefault/common"
 	"github.com/muidea/magicDefault/core/base/biz"
@@ -92,7 +92,7 @@ func (s *Authority) Notify(event event.Event, result event.Result) {
 	}
 
 	if event.Match(common.CreateAuthorityAccount) {
-		paramPtr := event.Data().(*casCommon.AccountParam)
+		paramPtr := event.Data().(*cc.AccountParam)
 		if paramPtr == nil {
 			return
 		}

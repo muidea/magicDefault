@@ -4,31 +4,33 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	casCommon "github.com/muidea/magicCas/common"
-	commonDef "github.com/muidea/magicCommon/def"
+	"net/http"
+
+	cd "github.com/muidea/magicCommon/def"
 	fn "github.com/muidea/magicCommon/foundation/net"
 	fu "github.com/muidea/magicCommon/foundation/util"
-	commonSession "github.com/muidea/magicCommon/session"
-	"net/http"
+	"github.com/muidea/magicCommon/session"
+
+	cc "github.com/muidea/magicCas/common"
 )
 
 func (s *Authority) filterAuthorityAccountLite(ctx context.Context, res http.ResponseWriter, req *http.Request, filter *fu.ContentFilter) {
-	curSession := ctx.Value(commonSession.AuthSession).(commonSession.Session)
-	result := &casCommon.AccountLiteListResult{}
+	curSession := ctx.Value(session.AuthSession).(session.Session)
+	result := &cc.AccountLiteListResult{}
 	for {
 		curNamespace := s.getCurrentNamespace(ctx, res, req)
 		filter.Remove("mode")
 
 		accountList, accountTotal, accountErr := s.bizPtr.FilterAuthorityAccountLite(curSession.GetSessionInfo(), filter, curNamespace)
 		if accountErr != nil {
-			result.ErrorCode = commonDef.Failed
+			result.ErrorCode = cd.Failed
 			result.Reason = accountErr.Error()
 			break
 		}
 
 		result.Account = accountList
 		result.Total = accountTotal
-		result.ErrorCode = commonDef.Success
+		result.ErrorCode = cd.Success
 		break
 	}
 
@@ -51,20 +53,20 @@ func (s *Authority) FilterAuthorityAccount(ctx context.Context, res http.Respons
 		return
 	}
 
-	curSession := ctx.Value(commonSession.AuthSession).(commonSession.Session)
-	result := &casCommon.AccountStatisticResult{}
+	curSession := ctx.Value(session.AuthSession).(session.Session)
+	result := &cc.AccountStatisticResult{}
 	for {
 		curNamespace := s.getCurrentNamespace(ctx, res, req)
 		accountList, accountTotal, accountErr := s.bizPtr.FilterAuthorityAccount(curSession.GetSessionInfo(), filter, curNamespace)
 		if accountErr != nil {
-			result.ErrorCode = commonDef.Failed
+			result.ErrorCode = cd.Failed
 			result.Reason = accountErr.Error()
 			break
 		}
 
 		roleList, _, roleErr := s.bizPtr.FilterAuthorityRoleLite(curSession.GetSessionInfo(), nil, curNamespace)
 		if roleErr != nil {
-			result.ErrorCode = commonDef.Failed
+			result.ErrorCode = cd.Failed
 			result.Reason = roleErr.Error()
 			break
 		}
@@ -72,7 +74,7 @@ func (s *Authority) FilterAuthorityAccount(ctx context.Context, res http.Respons
 		result.Account = accountList
 		result.Role = roleList
 		result.Total = accountTotal
-		result.ErrorCode = commonDef.Success
+		result.ErrorCode = cd.Success
 		break
 	}
 
@@ -86,12 +88,12 @@ func (s *Authority) FilterAuthorityAccount(ctx context.Context, res http.Respons
 }
 
 func (s *Authority) QueryAuthorityAccount(ctx context.Context, res http.ResponseWriter, req *http.Request) {
-	curSession := ctx.Value(commonSession.AuthSession).(commonSession.Session)
-	result := &casCommon.AccountResult{}
+	curSession := ctx.Value(session.AuthSession).(session.Session)
+	result := &cc.AccountResult{}
 	for {
 		id, err := fn.SplitRESTID(req.URL.Path)
 		if err != nil || id == 0 {
-			result.ErrorCode = commonDef.Failed
+			result.ErrorCode = cd.Failed
 			result.Reason = "invalid param"
 			break
 		}
@@ -99,13 +101,13 @@ func (s *Authority) QueryAuthorityAccount(ctx context.Context, res http.Response
 		curNamespace := s.getCurrentNamespace(ctx, res, req)
 		accountPtr, accountErr := s.bizPtr.QueryAuthorityAccount(curSession.GetSessionInfo(), id, curNamespace)
 		if accountErr != nil {
-			result.ErrorCode = commonDef.Failed
+			result.ErrorCode = cd.Failed
 			result.Reason = accountErr.Error()
 			break
 		}
 
 		result.Account = accountPtr
-		result.ErrorCode = commonDef.Success
+		result.ErrorCode = cd.Success
 		break
 	}
 
@@ -119,13 +121,13 @@ func (s *Authority) QueryAuthorityAccount(ctx context.Context, res http.Response
 }
 
 func (s *Authority) CreateAuthorityAccount(ctx context.Context, res http.ResponseWriter, req *http.Request) {
-	curSession := ctx.Value(commonSession.AuthSession).(commonSession.Session)
-	result := &casCommon.AccountResult{}
+	curSession := ctx.Value(session.AuthSession).(session.Session)
+	result := &cc.AccountResult{}
 	for {
-		param := &casCommon.AccountParam{}
+		param := &cc.AccountParam{}
 		err := fn.ParseJSONBody(req, s.validator, param)
 		if err != nil {
-			result.ErrorCode = commonDef.IllegalParam
+			result.ErrorCode = cd.IllegalParam
 			result.Reason = "invalid param"
 			break
 		}
@@ -133,7 +135,7 @@ func (s *Authority) CreateAuthorityAccount(ctx context.Context, res http.Respons
 		curNamespace := s.getCurrentNamespace(ctx, res, req)
 		accountPtr, accountErr := s.bizPtr.CreateAuthorityAccount(curSession.GetSessionInfo(), param, curNamespace)
 		if accountErr != nil {
-			result.ErrorCode = commonDef.Failed
+			result.ErrorCode = cd.Failed
 			result.Reason = accountErr.Error()
 			break
 		}
@@ -142,7 +144,7 @@ func (s *Authority) CreateAuthorityAccount(ctx context.Context, res http.Respons
 		s.writeLog(ctx, res, req, memo)
 
 		result.Account = accountPtr
-		result.ErrorCode = commonDef.Success
+		result.ErrorCode = cd.Success
 		break
 	}
 
@@ -156,20 +158,20 @@ func (s *Authority) CreateAuthorityAccount(ctx context.Context, res http.Respons
 }
 
 func (s *Authority) UpdateAuthorityAccount(ctx context.Context, res http.ResponseWriter, req *http.Request) {
-	curSession := ctx.Value(commonSession.AuthSession).(commonSession.Session)
-	result := &casCommon.AccountResult{}
+	curSession := ctx.Value(session.AuthSession).(session.Session)
+	result := &cc.AccountResult{}
 	for {
 		id, err := fn.SplitRESTID(req.URL.Path)
 		if err != nil || id == 0 {
-			result.ErrorCode = commonDef.Failed
+			result.ErrorCode = cd.Failed
 			result.Reason = "invalid param"
 			break
 		}
 
-		param := &casCommon.AccountParam{}
+		param := &cc.AccountParam{}
 		err = fn.ParseJSONBody(req, s.validator, param)
 		if err != nil {
-			result.ErrorCode = commonDef.IllegalParam
+			result.ErrorCode = cd.IllegalParam
 			result.Reason = "invalid param"
 			break
 		}
@@ -177,7 +179,7 @@ func (s *Authority) UpdateAuthorityAccount(ctx context.Context, res http.Respons
 		curNamespace := s.getCurrentNamespace(ctx, res, req)
 		accountPtr, accountErr := s.bizPtr.UpdateAuthorityAccount(curSession.GetSessionInfo(), id, param, curNamespace)
 		if accountErr != nil {
-			result.ErrorCode = commonDef.Failed
+			result.ErrorCode = cd.Failed
 			result.Reason = accountErr.Error()
 			break
 		}
@@ -186,7 +188,7 @@ func (s *Authority) UpdateAuthorityAccount(ctx context.Context, res http.Respons
 		s.writeLog(ctx, res, req, memo)
 
 		result.Account = accountPtr
-		result.ErrorCode = commonDef.Success
+		result.ErrorCode = cd.Success
 		break
 	}
 
@@ -200,12 +202,12 @@ func (s *Authority) UpdateAuthorityAccount(ctx context.Context, res http.Respons
 }
 
 func (s *Authority) DeleteAuthorityAccount(ctx context.Context, res http.ResponseWriter, req *http.Request) {
-	curSession := ctx.Value(commonSession.AuthSession).(commonSession.Session)
-	result := &casCommon.AccountResult{}
+	curSession := ctx.Value(session.AuthSession).(session.Session)
+	result := &cc.AccountResult{}
 	for {
 		id, err := fn.SplitRESTID(req.URL.Path)
 		if err != nil || id == 0 {
-			result.ErrorCode = commonDef.Failed
+			result.ErrorCode = cd.Failed
 			result.Reason = "invalid param"
 			break
 		}
@@ -213,7 +215,7 @@ func (s *Authority) DeleteAuthorityAccount(ctx context.Context, res http.Respons
 		curNamespace := s.getCurrentNamespace(ctx, res, req)
 		accountPtr, accountErr := s.bizPtr.DeleteAuthorityAccount(curSession.GetSessionInfo(), id, curNamespace)
 		if accountErr != nil {
-			result.ErrorCode = commonDef.Failed
+			result.ErrorCode = cd.Failed
 			result.Reason = accountErr.Error()
 			break
 		}
@@ -222,7 +224,7 @@ func (s *Authority) DeleteAuthorityAccount(ctx context.Context, res http.Respons
 		s.writeLog(ctx, res, req, memo)
 
 		result.Account = accountPtr
-		result.ErrorCode = commonDef.Success
+		result.ErrorCode = cd.Success
 		break
 	}
 

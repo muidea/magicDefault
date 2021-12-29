@@ -2,15 +2,18 @@ package biz
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/muidea/magicBatis/client"
+
 	"github.com/muidea/magicCommon/event"
-	commonSession "github.com/muidea/magicCommon/session"
+	"github.com/muidea/magicCommon/session"
 	"github.com/muidea/magicCommon/task"
+
 	"github.com/muidea/magicDefault/common"
 	"github.com/muidea/magicDefault/config"
 	"github.com/muidea/magicDefault/core/base/biz"
 	"github.com/muidea/magicDefault/core/kernel/setting/dao"
-	"time"
 )
 
 type Setting struct {
@@ -38,7 +41,7 @@ func (s *Setting) Notify(event event.Event, result event.Result) {
 	// TODO
 }
 
-func (s *Setting) QuerySetting(sessionInfo *commonSession.SessionInfo, namespace string) (ret []*common.Content, err error) {
+func (s *Setting) QuerySetting(sessionInfo *session.SessionInfo, namespace string) (ret []*common.Content, err error) {
 	ret = []*common.Content{}
 
 	if namespace == config.SuperNamespace() {

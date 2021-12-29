@@ -1,14 +1,16 @@
 package biz
 
 import (
-	casCommon "github.com/muidea/magicCas/common"
 	"github.com/muidea/magicCommon/event"
 	fu "github.com/muidea/magicCommon/foundation/util"
-	commonSession "github.com/muidea/magicCommon/session"
+	"github.com/muidea/magicCommon/session"
+
+	cc "github.com/muidea/magicCas/common"
+
 	"github.com/muidea/magicDefault/common"
 )
 
-func (s *Setting) queryNamespace(sessionInfo *commonSession.SessionInfo, namespace string) (ret *casCommon.NamespaceView) {
+func (s *Setting) queryNamespace(sessionInfo *session.SessionInfo, namespace string) (ret *cc.NamespaceView) {
 	eid := common.FilterAuthorityNamespace
 	header := event.NewValues()
 	header.Set("namespace", namespace)
@@ -23,7 +25,7 @@ func (s *Setting) queryNamespace(sessionInfo *commonSession.SessionInfo, namespa
 		return
 	}
 
-	namespaceList, namespaceOK := resultVal.([]*casCommon.NamespaceView)
+	namespaceList, namespaceOK := resultVal.([]*cc.NamespaceView)
 	if !namespaceOK || len(namespaceList) <= 0 {
 		return
 	}

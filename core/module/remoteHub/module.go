@@ -1,10 +1,11 @@
 package remoteHub
 
 import (
-	"github.com/muidea/magicCas/toolkit"
 	"github.com/muidea/magicCommon/event"
 	"github.com/muidea/magicCommon/module"
 	"github.com/muidea/magicCommon/task"
+
+	"github.com/muidea/magicCas/toolkit"
 
 	"github.com/muidea/magicDefault/assist/persistence"
 	"github.com/muidea/magicDefault/common"

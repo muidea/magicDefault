@@ -4,15 +4,15 @@ import (
 	"path"
 	"sync"
 
+	bc "github.com/muidea/magicBatis/common"
+
 	"github.com/muidea/magicCommon/event"
 	"github.com/muidea/magicCommon/foundation/generator"
 	fn "github.com/muidea/magicCommon/foundation/net"
-	commonSession "github.com/muidea/magicCommon/session"
+	"github.com/muidea/magicCommon/session"
 	"github.com/muidea/magicCommon/task"
 
-	bc "github.com/muidea/magicBatis/common"
-
-	casCommon "github.com/muidea/magicCas/common"
+	cc "github.com/muidea/magicCas/common"
 
 	"github.com/muidea/magicDefault/common"
 	"github.com/muidea/magicDefault/model"
@@ -61,9 +61,9 @@ func (s *Base) CallEvent(event event.Event) event.Result {
 }
 
 func (s *Base) Invoke(funcPtr func()) {
-	task := &invokeTask{funcPtr: funcPtr}
+	ptr := &invokeTask{funcPtr: funcPtr}
 
-	s.backgroundRoutine.Post(task)
+	s.backgroundRoutine.Post(ptr)
 }
 
 func (s *Base) RootDestination() string {
@@ -99,7 +99,7 @@ func (s *Base) GetPatternCode(pattern string) string {
 	return s.GenerateCode(s.GetGenerator(pattern))
 }
 
-func (s *Base) QueryEntity(sessionInfo *commonSession.SessionInfo, id int, namespace string) (ret *casCommon.EntityView) {
+func (s *Base) QueryEntity(sessionInfo *session.SessionInfo, id int, namespace string) (ret *cc.EntityView) {
 	eid := fn.FormatID(common.QueryEntity, id)
 	header := event.NewValues()
 	header.Set("namespace", namespace)
@@ -112,7 +112,7 @@ func (s *Base) QueryEntity(sessionInfo *commonSession.SessionInfo, id int, names
 		return
 	}
 
-	ret = resultVal.(*casCommon.EntityView)
+	ret = resultVal.(*cc.EntityView)
 	return
 }
 

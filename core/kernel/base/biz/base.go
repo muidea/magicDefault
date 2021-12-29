@@ -2,17 +2,18 @@ package biz
 
 import (
 	log "github.com/cihub/seelog"
+
 	"github.com/muidea/magicBatis/client"
 	bc "github.com/muidea/magicBatis/common"
-
-	casClient "github.com/muidea/magicCas/client"
-	casCommon "github.com/muidea/magicCas/common"
 
 	"github.com/muidea/magicCommon/event"
 	fn "github.com/muidea/magicCommon/foundation/net"
 	fu "github.com/muidea/magicCommon/foundation/util"
 	"github.com/muidea/magicCommon/session"
 	"github.com/muidea/magicCommon/task"
+
+	cClnt "github.com/muidea/magicCas/client"
+	cc "github.com/muidea/magicCas/common"
 
 	"github.com/muidea/magicDefault/common"
 	"github.com/muidea/magicDefault/core/base/biz"
@@ -81,8 +82,8 @@ func (s *Base) Notify(event event.Event, result event.Result) {
 	}
 }
 
-func (s *Base) LoginAccount(curSessionInfo *session.SessionInfo, account, password, namespace string) (entityPtr *casCommon.EntityView, sessionInfo *session.SessionInfo, err error) {
-	clnt := casClient.NewClient(s.casService)
+func (s *Base) LoginAccount(curSessionInfo *session.SessionInfo, account, password, namespace string) (entityPtr *cc.EntityView, sessionInfo *session.SessionInfo, err error) {
+	clnt := cClnt.NewClient(s.casService)
 	defer clnt.Release()
 
 	clnt.BindSession(curSessionInfo)
@@ -101,7 +102,7 @@ func (s *Base) LoginAccount(curSessionInfo *session.SessionInfo, account, passwo
 }
 
 func (s *Base) LogoutAccount(curSessionInfo *session.SessionInfo, namespace string) (ret *session.SessionInfo, err error) {
-	clnt := casClient.NewClient(s.casService)
+	clnt := cClnt.NewClient(s.casService)
 	defer clnt.Release()
 
 	clnt.BindSession(curSessionInfo)
@@ -119,8 +120,8 @@ func (s *Base) LogoutAccount(curSessionInfo *session.SessionInfo, namespace stri
 	return
 }
 
-func (s *Base) UpdateAccountPassword(curSessionInfo *session.SessionInfo, ptr *casCommon.UpdatePasswordParam, namespace string) (ret *casCommon.AccountView, err error) {
-	clnt := casClient.NewClient(s.casService)
+func (s *Base) UpdateAccountPassword(curSessionInfo *session.SessionInfo, ptr *cc.UpdatePasswordParam, namespace string) (ret *cc.AccountView, err error) {
+	clnt := cClnt.NewClient(s.casService)
 	defer clnt.Release()
 
 	clnt.BindSession(curSessionInfo)
@@ -130,8 +131,8 @@ func (s *Base) UpdateAccountPassword(curSessionInfo *session.SessionInfo, ptr *c
 	return
 }
 
-func (s *Base) VerifyEndpoint(curSessionInfo *session.SessionInfo, endpointName, identifyID, authToken, namespace string) (entityPtr *casCommon.EntityView, sessionInfo *session.SessionInfo, err error) {
-	clnt := casClient.NewClient(s.casService)
+func (s *Base) VerifyEndpoint(curSessionInfo *session.SessionInfo, endpointName, identifyID, authToken, namespace string) (entityPtr *cc.EntityView, sessionInfo *session.SessionInfo, err error) {
+	clnt := cClnt.NewClient(s.casService)
 	defer clnt.Release()
 
 	clnt.BindSession(curSessionInfo)
@@ -150,8 +151,8 @@ func (s *Base) VerifyEndpoint(curSessionInfo *session.SessionInfo, endpointName,
 	return
 }
 
-func (s *Base) RefreshSession(curSessionInfo *session.SessionInfo, namespace string) (entityPtr *casCommon.EntityView, sessionInfoPtr *session.SessionInfo, err error) {
-	clnt := casClient.NewClient(s.casService)
+func (s *Base) RefreshSession(curSessionInfo *session.SessionInfo, namespace string) (entityPtr *cc.EntityView, sessionInfoPtr *session.SessionInfo, err error) {
+	clnt := cClnt.NewClient(s.casService)
 	defer clnt.Release()
 
 	clnt.BindSession(curSessionInfo)
@@ -168,8 +169,8 @@ func (s *Base) RefreshSession(curSessionInfo *session.SessionInfo, namespace str
 	return
 }
 
-func (s *Base) VerifyEntityRole(curSessionInfo *session.SessionInfo, ptr *casCommon.EntityView, namespace string) (ret *casCommon.RoleView, err error) {
-	clnt := casClient.NewClient(s.casService)
+func (s *Base) VerifyEntityRole(curSessionInfo *session.SessionInfo, ptr *cc.EntityView, namespace string) (ret *cc.RoleView, err error) {
+	clnt := cClnt.NewClient(s.casService)
 	defer clnt.Release()
 
 	clnt.BindSession(curSessionInfo)
@@ -186,8 +187,8 @@ func (s *Base) VerifyEntityRole(curSessionInfo *session.SessionInfo, ptr *casCom
 	return
 }
 
-func (s *Base) QueryEntity(curSessionInfo *session.SessionInfo, id int, namespace string) (*casCommon.EntityView, error) {
-	clnt := casClient.NewClient(s.casService)
+func (s *Base) QueryEntity(curSessionInfo *session.SessionInfo, id int, namespace string) (*cc.EntityView, error) {
+	clnt := cClnt.NewClient(s.casService)
 	defer clnt.Release()
 
 	clnt.BindSession(curSessionInfo)
@@ -196,8 +197,8 @@ func (s *Base) QueryEntity(curSessionInfo *session.SessionInfo, id int, namespac
 	return clnt.QueryAccessEntity(id)
 }
 
-func (s *Base) QueryAccessLog(curSessionInfo *session.SessionInfo, entityPtr *casCommon.EntityView, filter *fu.Pagination, namespace string) (ret []*casCommon.LogView, total int64, err error) {
-	clnt := casClient.NewClient(s.casService)
+func (s *Base) QueryAccessLog(curSessionInfo *session.SessionInfo, entityPtr *cc.EntityView, filter *fu.Pagination, namespace string) (ret []*cc.LogView, total int64, err error) {
+	clnt := cClnt.NewClient(s.casService)
 	defer clnt.Release()
 
 	clnt.BindSession(curSessionInfo)

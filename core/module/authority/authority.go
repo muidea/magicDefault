@@ -1,10 +1,12 @@
 package authority
 
 import (
-	"github.com/muidea/magicCas/toolkit"
 	"github.com/muidea/magicCommon/event"
 	"github.com/muidea/magicCommon/module"
 	"github.com/muidea/magicCommon/task"
+
+	"github.com/muidea/magicCas/toolkit"
+
 	"github.com/muidea/magicDefault/common"
 	"github.com/muidea/magicDefault/config"
 	"github.com/muidea/magicDefault/core/module/authority/biz"

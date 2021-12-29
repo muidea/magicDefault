@@ -9,15 +9,15 @@ import (
 	"strings"
 	"time"
 
+	cd "github.com/muidea/magicCommon/def"
 	fn "github.com/muidea/magicCommon/foundation/net"
 	fu "github.com/muidea/magicCommon/foundation/util"
+	"github.com/muidea/magicCommon/session"
 
-	casCommon "github.com/muidea/magicCas/common"
-	casToolkit "github.com/muidea/magicCas/toolkit"
-	commonDef "github.com/muidea/magicCommon/def"
-	commonSession "github.com/muidea/magicCommon/session"
+	cc "github.com/muidea/magicCas/common"
+	"github.com/muidea/magicCas/toolkit"
 
-	fileCommon "github.com/muidea/magicFile/common"
+	fc "github.com/muidea/magicFile/common"
 
 	"github.com/muidea/magicDefault/common"
 	"github.com/muidea/magicDefault/core/module/image/biz"
@@ -25,9 +25,9 @@ import (
 )
 
 type Image struct {
-	routeRegistry     casToolkit.RouteRegistry
-	casRouteRegistry  casToolkit.CasRegistry
-	roleRouteRegistry casToolkit.RoleRegistry
+	routeRegistry     toolkit.RouteRegistry
+	casRouteRegistry  toolkit.CasRegistry
+	roleRouteRegistry toolkit.RoleRegistry
 
 	validator fu.Validator
 
@@ -46,9 +46,9 @@ func New(
 }
 
 func (s *Image) BindRegistry(
-	routeRegistry casToolkit.RouteRegistry,
-	casRouteRegistry casToolkit.CasRegistry,
-	roleRouteRegistry casToolkit.RoleRegistry) {
+	routeRegistry toolkit.RouteRegistry,
+	casRouteRegistry toolkit.CasRegistry,
+	roleRouteRegistry toolkit.RoleRegistry) {
 
 	s.routeRegistry = routeRegistry
 	s.casRouteRegistry = casRouteRegistry
@@ -57,10 +57,10 @@ func (s *Image) BindRegistry(
 
 // RegisterRoute 注册路由
 func (s *Image) RegisterRoute() {
-	s.roleRouteRegistry.AddHandler(common.FilterImage, "GET", casCommon.ReadPrivate, s.FilterImage)
-	s.roleRouteRegistry.AddHandler(common.QueryImage, "GET", casCommon.ReadPrivate, s.QueryImage)
-	s.roleRouteRegistry.AddHandler(common.UpdateImage, "PUT", casCommon.WritePrivate, s.UpdateImage)
-	s.roleRouteRegistry.AddHandler(common.DeleteImage, "DELETE", casCommon.DeletePrivate, s.DeleteImage)
+	s.roleRouteRegistry.AddHandler(common.FilterImage, "GET", cc.ReadPrivate, s.FilterImage)
+	s.roleRouteRegistry.AddHandler(common.QueryImage, "GET", cc.ReadPrivate, s.QueryImage)
+	s.roleRouteRegistry.AddHandler(common.UpdateImage, "PUT", cc.WritePrivate, s.UpdateImage)
+	s.roleRouteRegistry.AddHandler(common.DeleteImage, "DELETE", cc.DeletePrivate, s.DeleteImage)
 }
 
 func (s *Image) FilterImage(ctx context.Context, res http.ResponseWriter, req *http.Request) {
@@ -72,18 +72,18 @@ func (s *Image) FilterImage(ctx context.Context, res http.ResponseWriter, req *h
 		curNamespace := s.getCurrentNamespace(ctx, res, req)
 		imageList, imageTotal, imageErr := s.bizPtr.FilterImage(filter, curNamespace)
 		if imageErr != nil {
-			result.ErrorCode = commonDef.Failed
+			result.ErrorCode = cd.Failed
 			result.Reason = imageErr.Error()
 			break
 		}
 		for _, val := range imageList {
-			view := &fileCommon.FileView{}
+			view := &fc.FileView{}
 			view.FromFileDetail(val)
 			result.Image = append(result.Image, view)
 		}
 
 		result.Total = imageTotal
-		result.ErrorCode = commonDef.Success
+		result.ErrorCode = cd.Success
 		break
 	}
 
@@ -101,7 +101,7 @@ func (s *Image) QueryImage(ctx context.Context, res http.ResponseWriter, req *ht
 	for {
 		id, err := fn.SplitRESTID(req.URL.Path)
 		if err != nil || id == 0 {
-			result.ErrorCode = commonDef.Failed
+			result.ErrorCode = cd.Failed
 			result.Reason = "invalid param"
 			break
 		}
@@ -109,14 +109,14 @@ func (s *Image) QueryImage(ctx context.Context, res http.ResponseWriter, req *ht
 		curNamespace := s.getCurrentNamespace(ctx, res, req)
 		imagePtr, imageErr := s.bizPtr.QueryImage(id, curNamespace)
 		if imageErr != nil {
-			result.ErrorCode = commonDef.Failed
+			result.ErrorCode = cd.Failed
 			result.Reason = imageErr.Error()
 			break
 		}
 
-		result.Image = &fileCommon.FileView{}
+		result.Image = &fc.FileView{}
 		result.Image.FromFileDetail(imagePtr)
-		result.ErrorCode = commonDef.Success
+		result.ErrorCode = cd.Success
 		break
 	}
 
@@ -134,15 +134,15 @@ func (s *Image) UpdateImage(ctx context.Context, res http.ResponseWriter, req *h
 	for {
 		id, err := fn.SplitRESTID(req.URL.Path)
 		if err != nil || id == 0 {
-			result.ErrorCode = commonDef.Failed
+			result.ErrorCode = cd.Failed
 			result.Reason = "invalid param"
 			break
 		}
 
-		param := &fileCommon.FileParam{}
+		param := &fc.FileParam{}
 		err = fn.ParseJSONBody(req, nil, param)
 		if err != nil {
-			result.ErrorCode = commonDef.IllegalParam
+			result.ErrorCode = cd.IllegalParam
 			result.Reason = "invalid param"
 			break
 		}
@@ -150,14 +150,14 @@ func (s *Image) UpdateImage(ctx context.Context, res http.ResponseWriter, req *h
 		curNamespace := s.getCurrentNamespace(ctx, res, req)
 		imagePtr, imageErr := s.bizPtr.UpdateImage(id, param, curNamespace)
 		if imageErr != nil {
-			result.ErrorCode = commonDef.Failed
+			result.ErrorCode = cd.Failed
 			result.Reason = imageErr.Error()
 			break
 		}
 
-		result.Image = &fileCommon.FileView{}
+		result.Image = &fc.FileView{}
 		result.Image.FromFileDetail(imagePtr)
-		result.ErrorCode = commonDef.Success
+		result.ErrorCode = cd.Success
 		break
 	}
 
@@ -175,7 +175,7 @@ func (s *Image) DeleteImage(ctx context.Context, res http.ResponseWriter, req *h
 	for {
 		id, err := fn.SplitRESTID(req.URL.Path)
 		if err != nil || id == 0 {
-			result.ErrorCode = commonDef.Failed
+			result.ErrorCode = cd.Failed
 			result.Reason = "invalid param"
 			break
 		}
@@ -183,14 +183,14 @@ func (s *Image) DeleteImage(ctx context.Context, res http.ResponseWriter, req *h
 		curNamespace := s.getCurrentNamespace(ctx, res, req)
 		imagePtr, imageErr := s.bizPtr.DeleteImage(id, curNamespace)
 		if imageErr != nil {
-			result.ErrorCode = commonDef.Failed
+			result.ErrorCode = cd.Failed
 			result.Reason = imageErr.Error()
 			break
 		}
 
-		result.Image = &fileCommon.FileView{}
+		result.Image = &fc.FileView{}
 		result.Image.FromFileDetail(imagePtr)
-		result.ErrorCode = commonDef.Success
+		result.ErrorCode = cd.Success
 		break
 	}
 
@@ -203,19 +203,19 @@ func (s *Image) DeleteImage(ctx context.Context, res http.ResponseWriter, req *h
 	res.WriteHeader(http.StatusExpectationFailed)
 }
 
-func (s *Image) getCurrentEntity(ctx context.Context, res http.ResponseWriter, req *http.Request) (ret *casCommon.EntityView, err error) {
-	curSession := ctx.Value(commonSession.AuthSession).(commonSession.Session)
-	authVal, ok := curSession.GetOption(commonSession.AuthAccount)
+func (s *Image) getCurrentEntity(ctx context.Context, res http.ResponseWriter, req *http.Request) (ret *cc.EntityView, err error) {
+	curSession := ctx.Value(session.AuthSession).(session.Session)
+	authVal, ok := curSession.GetOption(session.AuthAccount)
 	if !ok {
 		err = fmt.Errorf("无效权限,未通过验证")
 		return
 	}
-	ret = authVal.(*casCommon.EntityView)
+	ret = authVal.(*cc.EntityView)
 	return
 }
 
 func (s *Image) getCurrentNamespace(ctx context.Context, res http.ResponseWriter, req *http.Request) (ret string) {
-	namespace := req.Header.Get(casCommon.NamespaceID)
+	namespace := req.Header.Get(cc.NamespaceID)
 	if namespace != "" {
 		ret = namespace
 		return
@@ -237,7 +237,7 @@ func (s *Image) getCurrentNamespace(ctx context.Context, res http.ResponseWriter
 	return
 }
 
-func (s *Image) queryEntity(sessionInfo *commonSession.SessionInfo, id int, namespace string) (ret *casCommon.EntityView) {
+func (s *Image) queryEntity(sessionInfo *session.SessionInfo, id int, namespace string) (ret *cc.EntityView) {
 	ret = s.bizPtr.QueryEntity(sessionInfo, id, namespace)
 	return
 }

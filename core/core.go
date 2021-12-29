@@ -16,7 +16,7 @@ import (
 	"github.com/muidea/magicCommon/task"
 	engine "github.com/muidea/magicEngine"
 
-	casCommon "github.com/muidea/magicCas/common"
+	cc "github.com/muidea/magicCas/common"
 	"github.com/muidea/magicCas/toolkit"
 
 	"github.com/muidea/magicDefault/assist/persistence"
@@ -48,7 +48,7 @@ func (s *loadNamespaceTask) Run() {
 	if resultErr != nil {
 		return
 	}
-	namespaceList, namespaceOK := resultVal.([]*casCommon.NamespaceView)
+	namespaceList, namespaceOK := resultVal.([]*cc.NamespaceView)
 	if !namespaceOK {
 		return
 	}
@@ -124,7 +124,7 @@ func (s *Core) OnTimeOut(session session.Session) {
 }
 
 // Verify verify current session
-func (s *Core) Verify(ctx context.Context, res http.ResponseWriter, req *http.Request) (ret *casCommon.EntityView, err error) {
+func (s *Core) Verify(ctx context.Context, res http.ResponseWriter, req *http.Request) (ret *cc.EntityView, err error) {
 	curSession := ctx.Value(session.AuthSession).(session.Session)
 	namespaceVal, ok := curSession.GetOption(session.AuthNamespace)
 	if !ok {
@@ -145,11 +145,11 @@ func (s *Core) Verify(ctx context.Context, res http.ResponseWriter, req *http.Re
 		return
 	}
 
-	ret = authVal.(*casCommon.EntityView)
+	ret = authVal.(*cc.EntityView)
 	return
 }
 
-func (s *Core) VerifyRole(ctx context.Context, res http.ResponseWriter, req *http.Request) (ret *casCommon.RoleView, err error) {
+func (s *Core) VerifyRole(ctx context.Context, res http.ResponseWriter, req *http.Request) (ret *cc.RoleView, err error) {
 	curSession := ctx.Value(session.AuthSession).(session.Session)
 	namespaceVal, ok := curSession.GetOption(session.AuthNamespace)
 	if !ok {
@@ -170,7 +170,7 @@ func (s *Core) VerifyRole(ctx context.Context, res http.ResponseWriter, req *htt
 		return
 	}
 
-	ret = roleVal.(*casCommon.RoleView)
+	ret = roleVal.(*cc.RoleView)
 	return
 }
 
@@ -189,7 +189,7 @@ func (s *Core) Handle(ctx engine.RequestContext, res http.ResponseWriter, req *h
 }
 
 func (s *Core) getRequestNamespace(res http.ResponseWriter, req *http.Request) (ret string) {
-	namespace := req.Header.Get(casCommon.NamespaceID)
+	namespace := req.Header.Get(cc.NamespaceID)
 	if namespace != "" {
 		ret = namespace
 		return

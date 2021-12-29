@@ -8,20 +8,21 @@ import (
 	"strings"
 	"time"
 
-	casCommon "github.com/muidea/magicCas/common"
-	casToolkit "github.com/muidea/magicCas/toolkit"
 	fn "github.com/muidea/magicCommon/foundation/net"
 	fu "github.com/muidea/magicCommon/foundation/util"
-	commonSession "github.com/muidea/magicCommon/session"
+	"github.com/muidea/magicCommon/session"
+
+	cc "github.com/muidea/magicCas/common"
+	"github.com/muidea/magicCas/toolkit"
 
 	"github.com/muidea/magicDefault/core/module/remoteHub/biz"
 	"github.com/muidea/magicDefault/model"
 )
 
 type RemoteHub struct {
-	routeRegistry     casToolkit.RouteRegistry
-	casRouteRegistry  casToolkit.CasRegistry
-	roleRouteRegistry casToolkit.RoleRegistry
+	routeRegistry     toolkit.RouteRegistry
+	casRouteRegistry  toolkit.CasRegistry
+	roleRouteRegistry toolkit.RoleRegistry
 
 	validator fu.Validator
 
@@ -44,9 +45,9 @@ func New(
 }
 
 func (s *RemoteHub) BindRegistry(
-	routeRegistry casToolkit.RouteRegistry,
-	casRouteRegistry casToolkit.CasRegistry,
-	roleRouteRegistry casToolkit.RoleRegistry) {
+	routeRegistry toolkit.RouteRegistry,
+	casRouteRegistry toolkit.CasRegistry,
+	roleRouteRegistry toolkit.RoleRegistry) {
 
 	s.routeRegistry = routeRegistry
 	s.casRouteRegistry = casRouteRegistry
@@ -57,19 +58,19 @@ func (s *RemoteHub) BindRegistry(
 func (s *RemoteHub) RegisterRoute() {
 }
 
-func (s *RemoteHub) getCurrentEntity(ctx context.Context, res http.ResponseWriter, req *http.Request) (ret *casCommon.EntityView, err error) {
-	curSession := ctx.Value(commonSession.AuthSession).(commonSession.Session)
-	authVal, ok := curSession.GetOption(commonSession.AuthAccount)
+func (s *RemoteHub) getCurrentEntity(ctx context.Context, res http.ResponseWriter, req *http.Request) (ret *cc.EntityView, err error) {
+	curSession := ctx.Value(session.AuthSession).(session.Session)
+	authVal, ok := curSession.GetOption(session.AuthAccount)
 	if !ok {
 		err = fmt.Errorf("无效权限,未通过验证")
 		return
 	}
-	ret = authVal.(*casCommon.EntityView)
+	ret = authVal.(*cc.EntityView)
 	return
 }
 
 func (s *RemoteHub) getCurrentNamespace(ctx context.Context, res http.ResponseWriter, req *http.Request) (ret string) {
-	namespace := req.Header.Get(casCommon.NamespaceID)
+	namespace := req.Header.Get(cc.NamespaceID)
 	if namespace != "" {
 		ret = namespace
 		return
@@ -91,7 +92,7 @@ func (s *RemoteHub) getCurrentNamespace(ctx context.Context, res http.ResponseWr
 	return
 }
 
-func (s *RemoteHub) queryEntity(sessionInfo *commonSession.SessionInfo, id int, namespace string) (ret *casCommon.EntityView) {
+func (s *RemoteHub) queryEntity(sessionInfo *session.SessionInfo, id int, namespace string) (ret *cc.EntityView) {
 	ret = s.bizPtr.QueryEntity(sessionInfo, id, namespace)
 	return
 }

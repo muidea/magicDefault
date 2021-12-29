@@ -4,10 +4,11 @@ import (
 	log "github.com/cihub/seelog"
 	"github.com/muidea/magicBatis/client"
 	bc "github.com/muidea/magicBatis/common"
-	casCommon "github.com/muidea/magicCas/common"
 
 	"github.com/muidea/magicCommon/event"
 	"github.com/muidea/magicCommon/task"
+
+	cc "github.com/muidea/magicCas/common"
 
 	"github.com/muidea/magicDefault/common"
 	"github.com/muidea/magicDefault/core/base/biz"
@@ -53,7 +54,7 @@ func (s *Totalizer) Notify(event event.Event, result event.Result) {
 	owner := event.Header().GetString("owner")
 	log.Infof("notify event, id:%s,source:%s,destination:%s, namespace:%s, owner:%s", event.ID(), event.Source(), event.Destination(), namespace, owner)
 	if event.Match(common.InitializeAuthorityNamespace) {
-		namespaceLite, namespaceOK := event.Data().(*casCommon.NamespaceView)
+		namespaceLite, namespaceOK := event.Data().(*cc.NamespaceView)
 		if !namespaceOK {
 			return
 		}
