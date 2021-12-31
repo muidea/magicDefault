@@ -1,13 +1,13 @@
 package remoteHub
 
 import (
+	"github.com/muidea/magicBatis/client"
 	"github.com/muidea/magicCommon/event"
 	"github.com/muidea/magicCommon/module"
 	"github.com/muidea/magicCommon/task"
 
 	"github.com/muidea/magicCas/toolkit"
 
-	"github.com/muidea/magicDefault/assist/persistence"
 	"github.com/muidea/magicDefault/common"
 	"github.com/muidea/magicDefault/core/module/remoteHub/biz"
 	"github.com/muidea/magicDefault/core/module/remoteHub/service"
@@ -18,6 +18,7 @@ func init() {
 }
 
 type RemoteHub struct {
+	batisClient       client.Client
 	routeRegistry     toolkit.RouteRegistry
 	casRouteRegistry  toolkit.CasRegistry
 	roleRouteRegistry toolkit.RoleRegistry
@@ -32,6 +33,10 @@ func New() module.Module {
 
 func (s *RemoteHub) ID() string {
 	return common.RemoteHubModule
+}
+
+func (s *RemoteHub) BindBatisClient(clnt client.Client) {
+	s.batisClient = clnt
 }
 
 func (s *RemoteHub) BindRegistry(
@@ -53,7 +58,7 @@ func (s *RemoteHub) Setup(
 	eventHub event.Hub,
 	backgroundRoutine task.BackgroundRoutine) {
 	s.biz = biz.New(endpointName,
-		persistence.GetBatisClient(),
+		s.batisClient,
 		eventHub,
 		backgroundRoutine,
 	)
