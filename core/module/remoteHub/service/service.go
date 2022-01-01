@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/muidea/magicDefault/common"
 	"net"
 	"net/http"
 	"strings"
@@ -52,6 +53,10 @@ func (s *RemoteHub) BindRegistry(
 	s.routeRegistry = routeRegistry
 	s.casRouteRegistry = casRouteRegistry
 	s.roleRouteRegistry = roleRouteRegistry
+
+	s.routeRegistry.SetApiVersion(common.ApiVersion)
+	s.casRouteRegistry.SetApiVersion(common.ApiVersion)
+	s.roleRouteRegistry.SetApiVersion(common.ApiVersion)
 }
 
 // RegisterRoute 注册路由
