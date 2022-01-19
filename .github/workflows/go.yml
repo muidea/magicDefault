@@ -24,6 +24,9 @@ jobs:
     - name: Test
       run: go test -v ./...
 
+    - name: checking
+      run: which magicDefault
+
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v2.3.1
       with:
