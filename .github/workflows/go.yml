@@ -23,3 +23,9 @@ jobs:
 
     - name: Test
       run: go test -v ./...
+
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v2.3.1
+      with:
+        path: artifact
+        # The desired behavior if no files are found using the provided path.
