@@ -24,13 +24,12 @@ jobs:
     - name: Test
       run: go test -v ./...
 
-    - name: checking
-      run: which magicDefault
+    - run: mkdir -p path/to/artifact
 
-    - run: mkdir artifact
-    
+    - run: echo hello > path/to/artifact/world.txt
+
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v2.3.1
       with:
-        path: artifact
-        # The desired behavior if no files are found using the provided path.
+        name: my-artifact
+        path: path/to/artifact/world.txt    
