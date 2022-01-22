@@ -24,9 +24,10 @@ jobs:
     - name: Test
       run: go test -v ./...
 
-    - name: prepare directory
+    - name: Create destination directory
       run: mkdir -p path/to/artifact
 
+    - name: Copy artifact to destination directory
     - run: cp magicDefault path/to/artifact/magicDefault
 
     - name: Upload a Build Artifact
