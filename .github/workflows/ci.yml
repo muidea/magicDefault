@@ -28,7 +28,7 @@ jobs:
       run: mkdir -p path/to/artifact
 
     - name: Copy artifact to destination directory
-    - run: cp magicDefault path/to/artifact/magicDefault
+      run: cp magicDefault path/to/artifact/magicDefault
 
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v2.3.1
