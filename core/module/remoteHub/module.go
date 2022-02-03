@@ -27,7 +27,7 @@ type RemoteHub struct {
 	biz     *biz.RemoteHub
 }
 
-func New() module.Module {
+func New() *RemoteHub {
 	return &RemoteHub{}
 }
 
