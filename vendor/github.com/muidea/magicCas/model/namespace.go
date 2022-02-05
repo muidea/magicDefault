@@ -27,7 +27,12 @@ func (s *Validity) Validate() bool {
 }
 
 func (s *Validity) UpdateExpire(expire int) {
-	s.EndTime = s.StartTime + int64(24*60*60*expire)
+	if s.Validate() {
+		s.EndTime = s.StartTime + int64(24*60*60*expire)
+		return
+	}
+
+	s.ResetExpire(expire)
 }
 
 func (s *Validity) ResetExpire(expire int) {
@@ -48,6 +53,10 @@ func (s *Validity) Expire() int {
 }
 
 func NewValidity(val int) Validity {
+	if val <= 0 {
+		val = 0
+	}
+
 	startTime := time.Now().UTC()
 	endTime := startTime.Add(time.Hour * time.Duration(24*val))
 	return Validity{StartTime: startTime.Unix(), EndTime: endTime.Unix()}

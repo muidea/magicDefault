@@ -60,7 +60,6 @@ func (s *Base) CallEvent(event event.Event) event.Result {
 
 func (s *Base) Invoke(funcPtr func()) {
 	taskPtr := &invokeTask{funcPtr: funcPtr}
-
 	s.backgroundRoutine.Post(taskPtr)
 }
 

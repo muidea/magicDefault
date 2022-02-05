@@ -51,9 +51,6 @@ type impl struct {
 func (s *impl) UploadFile(filePath string) (*fileModel.FileDetail, error) {
 	result := &fileCommon.UploadFileResult{}
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	vals.Set("key-name", fileItem)
 
 	url, _ := url.ParseRequestURI(s.serverURL)
@@ -74,9 +71,6 @@ func (s *impl) UploadFile(filePath string) (*fileModel.FileDetail, error) {
 func (s *impl) ViewFile(fileToken string) (*fileModel.FileDetail, error) {
 	result := &fileCommon.ViewFileResult{}
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	vals.Set("fileToken", fileToken)
 
 	url, _ := url.ParseRequestURI(s.serverURL)
@@ -96,9 +90,6 @@ func (s *impl) ViewFile(fileToken string) (*fileModel.FileDetail, error) {
 
 func (s *impl) DownloadFile(fileToken, filePath string) (string, error) {
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	vals.Set("fileToken", fileToken)
 
 	url, _ := url.ParseRequestURI(s.serverURL)
@@ -116,10 +107,6 @@ func (s *impl) DownloadFile(fileToken, filePath string) (string, error) {
 func (s *impl) UpdateFile(id int, param *fileCommon.FileParam) (*fileModel.FileDetail, error) {
 	result := &fileCommon.UpdateFileResult{}
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
-
 	url, _ := url.ParseRequestURI(s.serverURL)
 	url.Path = strings.Join([]string{url.Path, fileCommon.ApiVersion, fileCommon.UpdateFileURL}, "")
 	url.Path = strings.ReplaceAll(url.Path, ":id", fmt.Sprintf("%d", id))
@@ -139,10 +126,6 @@ func (s *impl) UpdateFile(id int, param *fileCommon.FileParam) (*fileModel.FileD
 func (s *impl) DeleteFile(id int) (*fileModel.FileDetail, error) {
 	result := &fileCommon.DeleteFileResult{}
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
-
 	url, _ := url.ParseRequestURI(s.serverURL)
 	url.Path = strings.Join([]string{url.Path, fileCommon.ApiVersion, fileCommon.DeleteFileURL}, "")
 	url.Path = strings.ReplaceAll(url.Path, ":id", fmt.Sprintf("%d", id))
@@ -162,10 +145,6 @@ func (s *impl) DeleteFile(id int) (*fileModel.FileDetail, error) {
 func (s *impl) QueryFile(id int) (*fileModel.FileDetail, error) {
 	result := &fileCommon.QueryFileResult{}
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
-
 	url, _ := url.ParseRequestURI(s.serverURL)
 	url.Path = strings.Join([]string{url.Path, fileCommon.ApiVersion, fileCommon.QueryFileURL}, "")
 	url.Path = strings.ReplaceAll(url.Path, ":id", fmt.Sprintf("%d", id))
@@ -185,10 +164,6 @@ func (s *impl) QueryFile(id int) (*fileModel.FileDetail, error) {
 func (s *impl) FilterFile(filter *fu.ContentFilter) (ret []*fileModel.FileDetail, total int64, err error) {
 	result := &fileCommon.QueryFilesResult{}
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
-
 	if filter != nil {
 		vals = filter.Encode(vals)
 	}
@@ -215,6 +190,9 @@ func (s *impl) getContextValues() url.Values {
 	ret := url.Values{}
 	if s.source != "" {
 		ret.Set("source", s.source)
+	}
+	if s.sessionInfo != nil {
+		ret = s.sessionInfo.Encode(ret)
 	}
 
 	return ret

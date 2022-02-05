@@ -10,21 +10,21 @@ github.com/go-playground/locales
 github.com/go-playground/locales/currency
 # github.com/go-playground/universal-translator v0.18.0
 github.com/go-playground/universal-translator
-# github.com/go-playground/validator/v10 v10.9.0
+# github.com/go-playground/validator/v10 v10.10.0
 github.com/go-playground/validator/v10
 # github.com/leodido/go-urn v1.2.1
 github.com/leodido/go-urn
-# github.com/muidea/magicBatis v0.0.0-20211228105518-b8f6b75b7e8c
+# github.com/muidea/magicBatis v0.0.0-20220204120557-f07e67a9b3d9
 ## explicit
 github.com/muidea/magicBatis/client
 github.com/muidea/magicBatis/common
-# github.com/muidea/magicCas v0.0.0-20211228110916-a6b86260aa89
+# github.com/muidea/magicCas v0.0.0-20220204121034-460b9a26f864
 ## explicit
 github.com/muidea/magicCas/client
 github.com/muidea/magicCas/common
 github.com/muidea/magicCas/model
 github.com/muidea/magicCas/toolkit
-# github.com/muidea/magicCommon v0.0.0-20211228124909-82a7246c7e17
+# github.com/muidea/magicCommon v0.0.0-20220204115542-5c28f61afd52
 ## explicit
 github.com/muidea/magicCommon/application
 github.com/muidea/magicCommon/def
@@ -40,21 +40,22 @@ github.com/muidea/magicCommon/task
 # github.com/muidea/magicEngine v0.0.0-20211219074645-49a3a434d25e
 ## explicit
 github.com/muidea/magicEngine
-# github.com/muidea/magicFile v0.0.0-20211228111533-2b83ad446877
+# github.com/muidea/magicFile v0.0.0-20220204121034-dd70f3fd7945
 ## explicit
 github.com/muidea/magicFile/client
 github.com/muidea/magicFile/common
 github.com/muidea/magicFile/model
-# github.com/muidea/magicOrm v0.0.0-20211220111942-47ecf517ade2
+# github.com/muidea/magicOrm v0.0.0-20220203084241-59a1fd56a2f3
 github.com/muidea/magicOrm/model
 github.com/muidea/magicOrm/provider
 github.com/muidea/magicOrm/provider/helper
 github.com/muidea/magicOrm/provider/local
 github.com/muidea/magicOrm/provider/remote
 github.com/muidea/magicOrm/util
-# golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3
+# golang.org/x/crypto v0.0.0-20220131195533-30dcbda58838
 golang.org/x/crypto/sha3
-# golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e
+# golang.org/x/sys v0.0.0-20220204135822-1c1b9b1eba6a
+## explicit
 golang.org/x/sys/cpu
 # golang.org/x/text v0.3.7
 golang.org/x/text/internal/language

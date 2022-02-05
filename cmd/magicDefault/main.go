@@ -14,7 +14,7 @@ import (
 )
 
 var listenPort = "8080"
-var endpointName = "magicDefault"
+var endpointName = "magicdefault"
 
 func initPprofMonitor(listenPort string) error {
 	var err error

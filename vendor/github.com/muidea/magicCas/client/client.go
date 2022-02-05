@@ -85,9 +85,6 @@ func (s *client) RefreshAccessSession() (*common.EntityView, *commonSession.Sess
 	result := &common.RefreshResult{}
 
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	url, _ := url.ParseRequestURI(s.serverURL)
 	url.Path = strings.Join([]string{url.Path, common.ApiVersion, common.RefreshSession}, "")
 	url.RawQuery = vals.Encode()
@@ -108,9 +105,6 @@ func (s *client) LoginAccessAccount(account, password string) (*common.EntityVie
 	result := &common.LoginResult{}
 
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	url, _ := url.ParseRequestURI(s.serverURL)
 	url.Path = strings.Join([]string{url.Path, common.ApiVersion, common.LoginAccount}, "")
 	url.RawQuery = vals.Encode()
@@ -131,9 +125,6 @@ func (s *client) LogoutAccessAccount() (*commonSession.SessionInfo, error) {
 	result := &common.LogoutResult{}
 
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	url, _ := url.ParseRequestURI(s.serverURL)
 	url.Path = strings.Join([]string{url.Path, common.ApiVersion, common.LogoutAccount}, "")
 	url.RawQuery = vals.Encode()
@@ -153,9 +144,6 @@ func (s *client) UpdateAccountPassword(ptr *common.UpdatePasswordParam) (ret *co
 	result := &common.AccountResult{}
 
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	url, _ := url.ParseRequestURI(s.serverURL)
 	url.Path = strings.Join([]string{url.Path, common.ApiVersion, common.UpdateAccountPassword}, "")
 	url.RawQuery = vals.Encode()
@@ -177,9 +165,6 @@ func (s *client) VerifyAccessEndpoint(endpointName, identifyID, authToken string
 	result := &common.VerifyEndpointResult{}
 
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	url, _ := url.ParseRequestURI(s.serverURL)
 	url.Path = strings.Join([]string{url.Path, common.ApiVersion, common.VerifyEndpoint}, "")
 	url.RawQuery = vals.Encode()
@@ -200,9 +185,6 @@ func (s *client) VerifyEntityRole(ptr *common.EntityView) (*common.RoleView, err
 	result := &common.EntityRoleResult{}
 
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	vals = ptr.Encode(vals)
 	url, _ := url.ParseRequestURI(s.serverURL)
 	url.Path = strings.Join([]string{url.Path, common.ApiVersion, common.VerifyEntityRole}, "")
@@ -224,9 +206,6 @@ func (s *client) QueryAccessEntity(id int) (ret *common.EntityView, err error) {
 	result := &common.QueryEntityResult{}
 
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	url, _ := url.ParseRequestURI(s.serverURL)
 	url.Path = strings.Join([]string{url.Path, common.ApiVersion, common.QueryEntity}, "")
 	url.Path = strings.ReplaceAll(url.Path, ":id", fmt.Sprintf("%d", id))
@@ -250,9 +229,6 @@ func (s *client) FilterAccessLog(entityPtr *common.EntityView, filter *util.Pagi
 	result := &common.AccessLogListResult{}
 
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	if filter != nil {
 		vals = filter.Encode(vals)
 	}
@@ -282,9 +258,6 @@ func (s *client) FilterAccount(filter *util.ContentFilter) (ret []*common.Accoun
 	result := &common.AccountListResult{}
 
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	if filter != nil {
 		vals = filter.Encode(vals)
 	}
@@ -313,9 +286,6 @@ func (s *client) FilterAccountLite(filter *util.ContentFilter) (ret []*common.Ac
 	result := &common.AccountLiteListResult{}
 
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	if filter != nil {
 		vals = filter.Encode(vals)
 	}
@@ -344,9 +314,6 @@ func (s *client) QueryAccount(id int) (ret *common.AccountView, err error) {
 	result := &common.AccountResult{}
 
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	url, _ := url.ParseRequestURI(s.serverURL)
 	url.Path = strings.Join([]string{url.Path, common.ApiVersion, common.QueryAccount}, "")
 	url.Path = strings.ReplaceAll(url.Path, ":id", fmt.Sprintf("%d", id))
@@ -370,9 +337,6 @@ func (s *client) CreateAccount(ptr *common.AccountParam) (ret *common.AccountVie
 	result := &common.AccountResult{}
 
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	url, _ := url.ParseRequestURI(s.serverURL)
 	url.Path = strings.Join([]string{url.Path, common.ApiVersion, common.CreateAccount}, "")
 	url.RawQuery = vals.Encode()
@@ -394,9 +358,6 @@ func (s *client) UpdateAccount(id int, ptr *common.AccountParam) (ret *common.Ac
 	result := &common.AccountResult{}
 
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	url, _ := url.ParseRequestURI(s.serverURL)
 	url.Path = strings.Join([]string{url.Path, common.ApiVersion, common.UpdateAccount}, "")
 	url.Path = strings.ReplaceAll(url.Path, ":id", fmt.Sprintf("%d", id))
@@ -420,9 +381,6 @@ func (s *client) DeleteAccount(id int) (ret *common.AccountView, err error) {
 	result := &common.AccountResult{}
 
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	url, _ := url.ParseRequestURI(s.serverURL)
 	url.Path = strings.Join([]string{url.Path, common.ApiVersion, common.DeleteAccount}, "")
 	url.Path = strings.ReplaceAll(url.Path, ":id", fmt.Sprintf("%d", id))
@@ -446,9 +404,6 @@ func (s *client) CheckAccount(account string) (ret []*common.AccountLite, err er
 	result := &common.AccountLiteListResult{}
 
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	vals.Set("account", account)
 	url, _ := url.ParseRequestURI(s.serverURL)
 	url.Path = strings.Join([]string{url.Path, common.ApiVersion, common.CheckAccount}, "")
@@ -472,9 +427,6 @@ func (s *client) FilterEndpoint(filter *util.ContentFilter) (ret []*common.Endpo
 	result := &common.EndpointListResult{}
 
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	if filter != nil {
 		vals = filter.Encode(vals)
 	}
@@ -503,9 +455,6 @@ func (s *client) FilterEndpointLite(filter *util.ContentFilter) (ret []*common.E
 	result := &common.EndpointLiteListResult{}
 
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	if filter != nil {
 		vals = filter.Encode(vals)
 	}
@@ -534,9 +483,6 @@ func (s *client) QueryEndpoint(id int) (ret *common.EndpointView, err error) {
 	result := &common.EndpointResult{}
 
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	url, _ := url.ParseRequestURI(s.serverURL)
 	url.Path = strings.Join([]string{url.Path, common.ApiVersion, common.QueryEndpoint}, "")
 	url.Path = strings.ReplaceAll(url.Path, ":id", fmt.Sprintf("%d", id))
@@ -560,9 +506,6 @@ func (s *client) CreateEndpoint(ptr *common.EndpointParam) (ret *common.Endpoint
 	result := &common.EndpointResult{}
 
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	url, _ := url.ParseRequestURI(s.serverURL)
 	url.Path = strings.Join([]string{url.Path, common.ApiVersion, common.CreateEndpoint}, "")
 	url.RawQuery = vals.Encode()
@@ -584,9 +527,6 @@ func (s *client) UpdateEndpoint(id int, ptr *common.EndpointParam) (ret *common.
 	result := &common.EndpointResult{}
 
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	url, _ := url.ParseRequestURI(s.serverURL)
 	url.Path = strings.Join([]string{url.Path, common.ApiVersion, common.UpdateEndpoint}, "")
 	url.Path = strings.ReplaceAll(url.Path, ":id", fmt.Sprintf("%d", id))
@@ -610,9 +550,6 @@ func (s *client) DeleteEndpoint(id int) (ret *common.EndpointView, err error) {
 	result := &common.EndpointResult{}
 
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	url, _ := url.ParseRequestURI(s.serverURL)
 	url.Path = strings.Join([]string{url.Path, common.ApiVersion, common.DeleteEndpoint}, "")
 	url.Path = strings.ReplaceAll(url.Path, ":id", fmt.Sprintf("%d", id))
@@ -636,9 +573,6 @@ func (s *client) FilterRole(filter *util.ContentFilter) (ret []*common.RoleView,
 	result := &common.RoleListResult{}
 
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	if filter != nil {
 		vals = filter.Encode(vals)
 	}
@@ -667,9 +601,6 @@ func (s *client) FilterRoleLite(filter *util.ContentFilter) (ret []*common.RoleL
 	result := &common.RoleLiteListResult{}
 
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	if filter != nil {
 		vals = filter.Encode(vals)
 	}
@@ -698,9 +629,6 @@ func (s *client) QueryRole(id int) (ret *common.RoleView, err error) {
 	result := &common.RoleResult{}
 
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	url, _ := url.ParseRequestURI(s.serverURL)
 	url.Path = strings.Join([]string{url.Path, common.ApiVersion, common.QueryRole}, "")
 	url.Path = strings.ReplaceAll(url.Path, ":id", fmt.Sprintf("%d", id))
@@ -724,9 +652,6 @@ func (s *client) CreateRole(ptr *common.RoleParam) (ret *common.RoleView, err er
 	result := &common.RoleResult{}
 
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	url, _ := url.ParseRequestURI(s.serverURL)
 	url.Path = strings.Join([]string{url.Path, common.ApiVersion, common.CreateRole}, "")
 	url.RawQuery = vals.Encode()
@@ -748,9 +673,6 @@ func (s *client) UpdateRole(id int, ptr *common.RoleParam) (ret *common.RoleView
 	result := &common.RoleResult{}
 
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	url, _ := url.ParseRequestURI(s.serverURL)
 	url.Path = strings.Join([]string{url.Path, common.ApiVersion, common.UpdateRole}, "")
 	url.Path = strings.ReplaceAll(url.Path, ":id", fmt.Sprintf("%d", id))
@@ -774,9 +696,6 @@ func (s *client) DeleteRole(id int) (ret *common.RoleView, err error) {
 	result := &common.RoleResult{}
 
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	url, _ := url.ParseRequestURI(s.serverURL)
 	url.Path = strings.Join([]string{url.Path, common.ApiVersion, common.DeleteRole}, "")
 	url.Path = strings.ReplaceAll(url.Path, ":id", fmt.Sprintf("%d", id))
@@ -800,9 +719,6 @@ func (s *client) FilterNamespace(filter *util.ContentFilter) (ret []*common.Name
 	result := &common.NamespaceStatisticResult{}
 
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	if filter != nil {
 		vals = filter.Encode(vals)
 	}
@@ -830,9 +746,6 @@ func (s *client) FilterNamespaceLite(filter *util.ContentFilter) (ret []*common.
 	result := &common.NamespaceLiteListResult{}
 
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	if filter != nil {
 		vals = filter.Encode(vals)
 	}
@@ -860,9 +773,6 @@ func (s *client) QueryNamespace(id int) (ret *common.NamespaceView, err error) {
 	result := &common.NamespaceResult{}
 
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	url, _ := url.ParseRequestURI(s.serverURL)
 	url.Path = strings.Join([]string{url.Path, common.ApiVersion, common.QueryNamespace}, "")
 	url.Path = strings.ReplaceAll(url.Path, ":id", fmt.Sprintf("%d", id))
@@ -886,9 +796,6 @@ func (s *client) CreateNamespace(ptr *common.NamespaceParam) (ret *common.Namesp
 	result := &common.NamespaceResult{}
 
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	url, _ := url.ParseRequestURI(s.serverURL)
 	url.Path = strings.Join([]string{url.Path, common.ApiVersion, common.CreateNamespace}, "")
 	url.RawQuery = vals.Encode()
@@ -910,9 +817,6 @@ func (s *client) UpdateNamespace(id int, ptr *common.NamespaceParam) (ret *commo
 	result := &common.NamespaceResult{}
 
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	url, _ := url.ParseRequestURI(s.serverURL)
 	url.Path = strings.Join([]string{url.Path, common.ApiVersion, common.UpdateNamespace}, "")
 	url.Path = strings.ReplaceAll(url.Path, ":id", fmt.Sprintf("%d", id))
@@ -936,9 +840,6 @@ func (s *client) DeleteNamespace(id int) (ret *common.NamespaceView, err error) 
 	result := &common.NamespaceResult{}
 
 	vals := url.Values{}
-	if s.sessionInfo != nil {
-		vals = s.sessionInfo.Encode(vals)
-	}
 	url, _ := url.ParseRequestURI(s.serverURL)
 	url.Path = strings.Join([]string{url.Path, common.ApiVersion, common.DeleteNamespace}, "")
 	url.Path = strings.ReplaceAll(url.Path, ":id", fmt.Sprintf("%d", id))
@@ -970,6 +871,9 @@ func (s *client) getContextValues() url.Values {
 	ret := url.Values{}
 	if s.contextInfo != nil {
 		ret = s.contextInfo.Encode(ret)
+	}
+	if s.sessionInfo != nil {
+		ret = s.sessionInfo.Encode(ret)
 	}
 	if s.namespace != "" {
 		ret.Set(common.NamespaceID, s.namespace)

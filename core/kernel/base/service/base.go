@@ -64,6 +64,10 @@ func (s *Base) BindRegistry(
 	s.routeRegistry = routeRegistry
 	s.casRouteRegistry = casRouteRegistry
 	s.roleRouteRegistry = roleRouteRegistry
+
+	s.routeRegistry.SetApiVersion(common.ApiVersion)
+	s.casRouteRegistry.SetApiVersion(common.ApiVersion)
+	s.roleRouteRegistry.SetApiVersion(common.ApiVersion)
 }
 
 // LoginAccount login account
@@ -293,7 +297,7 @@ func (s *Base) RefreshSession(ctx context.Context, res http.ResponseWriter, req 
 func (s *Base) QueryAccessLog(ctx context.Context, res http.ResponseWriter, req *http.Request) {
 	curSession := ctx.Value(session.AuthSession).(session.Session)
 
-	filter := fu.NewPagination()
+	filter := fu.NewPagination(20, 1)
 	filter.Decode(req)
 
 	result := &cc.AccessLogListResult{}
