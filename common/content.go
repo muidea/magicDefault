@@ -23,6 +23,13 @@ const (
 	DeleteContentCatalog = "/content/catalog/delete/:id"
 	NotifyContentCatalog = "/content/catalog/notify/:id"
 
+	FilterContentComment = "/content/comment/query/"
+	QueryContentComment  = "/content/comment/query/:id"
+	CreateContentComment = "/content/comment/create/"
+	UpdateContentComment = "/content/comment/update/:id"
+	DeleteContentComment = "/content/comment/delete/:id"
+	NotifyContentComment = "/content/comment/notify/:id"
+
 	FilterContentLink = "/content/link/query/"
 	QueryContentLink  = "/content/link/query/:id"
 	CreateContentLink = "/content/link/create/"
@@ -36,13 +43,6 @@ const (
 	UpdateContentMedia = "/content/media/update/:id"
 	DeleteContentMedia = "/content/media/delete/:id"
 	NotifyContentMedia = "/content/media/notify/:id"
-
-	FilterContentComment = "/content/comment/query/"
-	QueryContentComment  = "/content/comment/query/:id"
-	CreateContentComment = "/content/comment/create/"
-	UpdateContentComment = "/content/comment/update/:id"
-	DeleteContentComment = "/content/comment/delete/:id"
-	NotifyContentComment = "/content/comment/notify/:id"
 )
 
 type ArticleView struct {
@@ -251,6 +251,102 @@ type CatalogListResult struct {
 
 type CatalogStatisticResult struct {
 	CatalogListResult
+	Summary []*TotalizerView `json:"summary"`
+}
+
+type CommentView struct {
+	ID         int            `json:"id"`
+	Content    string         `json:"content"`
+	Flag       int            `json:"flag"`
+	Creater    *cc.EntityView `json:"creater"`
+	UpdateTime int64          `json:"updateTime"`
+}
+
+func (s *CommentView) FromComment(ptr *model.Comment, entityPtr *cc.EntityView) {
+	s.ID = ptr.ID
+	s.Content = ptr.Content
+	s.Flag = ptr.Flag
+	s.Creater = entityPtr
+	s.UpdateTime = ptr.UpdateTime
+	return
+}
+
+type CommentLite struct {
+	ID      int    `json:"id"`
+	Content string `json:"content"`
+	Flag    int    `json:"flag"`
+}
+
+func (s *CommentLite) FromComment(ptr *model.Comment) {
+	s.ID = ptr.ID
+	s.Content = ptr.Content
+	s.Flag = ptr.Flag
+	return
+}
+
+func (s *CommentLite) FromView(ptr *CommentView) {
+	s.ID = ptr.ID
+	s.Content = ptr.Content
+	s.Flag = ptr.Flag
+	return
+}
+
+func (s *CommentLite) ToComment() (ret *model.Comment) {
+	ptr := &model.Comment{}
+	if s.ID != 0 {
+		ptr.ID = s.ID
+	}
+	if s.Content != "" {
+		ptr.Content = s.Content
+	}
+	if s.Flag != 0 {
+		ptr.Flag = s.Flag
+	}
+	ret = ptr
+	return
+}
+
+type CommentParam struct {
+	ID      int    `json:"id"`
+	Content string `json:"content"`
+	Flag    int    `json:"flag"`
+}
+
+func (s *CommentParam) ToComment(ptr *model.Comment) (ret *model.Comment) {
+	if ptr == nil {
+		ptr = &model.Comment{}
+	}
+
+	if s.Content != "" {
+		ptr.Content = s.Content
+	}
+	if s.Flag != 0 {
+		ptr.Flag = s.Flag
+	}
+
+	ret = ptr
+	return
+}
+
+type CommentResult struct {
+	cd.Result
+	Comment *CommentView `json:"comment"`
+}
+
+type CommentLiteListResult struct {
+	cd.Result
+	Total   int64          `json:"total"`
+	Comment []*CommentLite `json:"comment"`
+}
+
+type CommentListResult struct {
+	cd.Result
+	Total   int64          `json:"total"`
+	Comment []*CommentView `json:"comment"`
+}
+
+type CommentStatisticResult struct {
+	CommentListResult
 	Summary []*TotalizerView `json:"summary"`
 }
 
@@ -493,101 +589,5 @@ type MediaListResult struct {
 
 type MediaStatisticResult struct {
 	MediaListResult
-	Summary []*TotalizerView `json:"summary"`
-}
-
-type CommentView struct {
-	ID         int            `json:"id"`
-	Content    string         `json:"content"`
-	Flag       int            `json:"flag"`
-	Creater    *cc.EntityView `json:"creater"`
-	UpdateTime int64          `json:"updateTime"`
-}
-
-func (s *CommentView) FromComment(ptr *model.Comment, entityPtr *cc.EntityView) {
-	s.ID = ptr.ID
-	s.Content = ptr.Content
-	s.Flag = ptr.Flag
-	s.Creater = entityPtr
-	s.UpdateTime = ptr.UpdateTime
-	return
-}
-
-type CommentLite struct {
-	ID      int    `json:"id"`
-	Content string `json:"content"`
-	Flag    int    `json:"flag"`
-}
-
-func (s *CommentLite) FromComment(ptr *model.Comment) {
-	s.ID = ptr.ID
-	s.Content = ptr.Content
-	s.Flag = ptr.Flag
-	return
-}
-
-func (s *CommentLite) FromView(ptr *CommentView) {
-	s.ID = ptr.ID
-	s.Content = ptr.Content
-	s.Flag = ptr.Flag
-	return
-}
-
-func (s *CommentLite) ToComment() (ret *model.Comment) {
-	ptr := &model.Comment{}
-	if s.ID != 0 {
-		ptr.ID = s.ID
-	}
-	if s.Content != "" {
-		ptr.Content = s.Content
-	}
-	if s.Flag != 0 {
-		ptr.Flag = s.Flag
-	}
-	ret = ptr
-	return
-}
-
-type CommentParam struct {
-	ID      int    `json:"id"`
-	Content string `json:"content"`
-	Flag    int    `json:"flag"`
-}
-
-func (s *CommentParam) ToComment(ptr *model.Comment) (ret *model.Comment) {
-	if ptr == nil {
-		ptr = &model.Comment{}
-	}
-
-	if s.Content != "" {
-		ptr.Content = s.Content
-	}
-	if s.Flag != 0 {
-		ptr.Flag = s.Flag
-	}
-
-	ret = ptr
-	return
-}
-
-type CommentResult struct {
-	cd.Result
-	Comment *CommentView `json:"comment"`
-}
-
-type CommentLiteListResult struct {
-	cd.Result
-	Total   int64          `json:"total"`
-	Comment []*CommentLite `json:"comment"`
-}
-
-type CommentListResult struct {
-	cd.Result
-	Total   int64          `json:"total"`
-	Comment []*CommentView `json:"comment"`
-}
-
-type CommentStatisticResult struct {
-	CommentListResult
 	Summary []*TotalizerView `json:"summary"`
 }

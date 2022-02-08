@@ -21,6 +21,12 @@ type Content interface {
 	UpdateCatalog(ptr *model.Catalog, namespace string) (ret *model.Catalog, err error)
 	DeleteCatalog(id int, namespace string) (ret *model.Catalog, err error)
 
+	FilterComment(filter *bc.QueryFilter, namespace string) (ret []*model.Comment, total int64, err error)
+	QueryComment(id int, namespace string) (ret *model.Comment, err error)
+	CreateComment(ptr *model.Comment, namespace string) (ret *model.Comment, err error)
+	UpdateComment(ptr *model.Comment, namespace string) (ret *model.Comment, err error)
+	DeleteComment(id int, namespace string) (ret *model.Comment, err error)
+
 	FilterLink(filter *bc.QueryFilter, namespace string) (ret []*model.Link, total int64, err error)
 	QueryLink(id int, namespace string) (ret *model.Link, err error)
 	CreateLink(ptr *model.Link, namespace string) (ret *model.Link, err error)
@@ -32,12 +38,6 @@ type Content interface {
 	CreateMedia(ptr *model.Media, namespace string) (ret *model.Media, err error)
 	UpdateMedia(ptr *model.Media, namespace string) (ret *model.Media, err error)
 	DeleteMedia(id int, namespace string) (ret *model.Media, err error)
-
-	FilterComment(filter *bc.QueryFilter, namespace string) (ret []*model.Comment, total int64, err error)
-	QueryComment(id int, namespace string) (ret *model.Comment, err error)
-	CreateComment(ptr *model.Comment, namespace string) (ret *model.Comment, err error)
-	UpdateComment(ptr *model.Comment, namespace string) (ret *model.Comment, err error)
-	DeleteComment(id int, namespace string) (ret *model.Comment, err error)
 }
 
 func New(clnt client.Client) Content {
@@ -186,6 +186,75 @@ func (s *content) DeleteCatalog(id int, namespace string) (ret *model.Catalog, e
 	return
 }
 
+func (s *content) FilterComment(filter *bc.QueryFilter, namespace string) (ret []*model.Comment, total int64, err error) {
+	ret = []*model.Comment{}
+	if filter == nil {
+		filter = bc.NewFilter()
+	}
+	filter.Equal("Namespace", namespace)
+	filter.ValueMask(&model.Comment{})
+	total, err = s.batisClient.BatchQueryEntity(&ret, filter)
+	return
+}
+
+func (s *content) QueryComment(id int, namespace string) (ret *model.Comment, err error) {
+	if id <= 0 {
+		err = fmt.Errorf("illegal id value, id:%d", id)
+		return
+	}
+	ptr := &model.Comment{}
+	ptr.ID = id
+	ptr.Namespace = namespace
+	err = s.batisClient.QueryEntity(ptr)
+	if err != nil {
+		return
+	}
+	ret = ptr
+	return
+}
+
+func (s *content) CreateComment(ptr *model.Comment, namespace string) (ret *model.Comment, err error) {
+	if ptr == nil {
+		err = fmt.Errorf("illegal ptr value")
+		return
+	}
+	ptr.Namespace = namespace
+	err = s.batisClient.InsertEntity(ptr)
+	if err != nil {
+		return
+	}
+	ret = ptr
+	return
+}
+
+func (s *content) UpdateComment(ptr *model.Comment, namespace string) (ret *model.Comment, err error) {
+	if ptr == nil || ptr.ID <= 0 {
+		err = fmt.Errorf("illegal update ptr")
+		return
+	}
+	ptr.Namespace = namespace
+	err = s.batisClient.UpdateEntity(ptr)
+	if err != nil {
+		return
+	}
+	ret = ptr
+	return
+}
+
+func (s *content) DeleteComment(id int, namespace string) (ret *model.Comment, err error) {
+	valPtr, valErr := s.QueryComment(id, namespace)
+	if valErr != nil {
+		err = valErr
+		return
+	}
+	err = s.batisClient.DeleteEntity(valPtr)
+	if err != nil {
+		return
+	}
+	ret = valPtr
+	return
+}
+
 func (s *content) FilterLink(filter *bc.QueryFilter, namespace string) (ret []*model.Link, total int64, err error) {
 	ret = []*model.Link{}
 	if filter == nil {
@@ -312,75 +381,6 @@ func (s *content) UpdateMedia(ptr *model.Media, namespace string) (ret *model.Me
 
 func (s *content) DeleteMedia(id int, namespace string) (ret *model.Media, err error) {
 	valPtr, valErr := s.QueryMedia(id, namespace)
-	if valErr != nil {
-		err = valErr
-		return
-	}
-	err = s.batisClient.DeleteEntity(valPtr)
-	if err != nil {
-		return
-	}
-	ret = valPtr
-	return
-}
-
-func (s *content) FilterComment(filter *bc.QueryFilter, namespace string) (ret []*model.Comment, total int64, err error) {
-	ret = []*model.Comment{}
-	if filter == nil {
-		filter = bc.NewFilter()
-	}
-	filter.Equal("Namespace", namespace)
-	filter.ValueMask(&model.Comment{})
-	total, err = s.batisClient.BatchQueryEntity(&ret, filter)
-	return
-}
-
-func (s *content) QueryComment(id int, namespace string) (ret *model.Comment, err error) {
-	if id <= 0 {
-		err = fmt.Errorf("illegal id value, id:%d", id)
-		return
-	}
-	ptr := &model.Comment{}
-	ptr.ID = id
-	ptr.Namespace = namespace
-	err = s.batisClient.QueryEntity(ptr)
-	if err != nil {
-		return
-	}
-	ret = ptr
-	return
-}
-
-func (s *content) CreateComment(ptr *model.Comment, namespace string) (ret *model.Comment, err error) {
-	if ptr == nil {
-		err = fmt.Errorf("illegal ptr value")
-		return
-	}
-	ptr.Namespace = namespace
-	err = s.batisClient.InsertEntity(ptr)
-	if err != nil {
-		return
-	}
-	ret = ptr
-	return
-}
-
-func (s *content) UpdateComment(ptr *model.Comment, namespace string) (ret *model.Comment, err error) {
-	if ptr == nil || ptr.ID <= 0 {
-		err = fmt.Errorf("illegal update ptr")
-		return
-	}
-	ptr.Namespace = namespace
-	err = s.batisClient.UpdateEntity(ptr)
-	if err != nil {
-		return
-	}
-	ret = ptr
-	return
-}
-
-func (s *content) DeleteComment(id int, namespace string) (ret *model.Comment, err error) {
-	valPtr, valErr := s.QueryComment(id, namespace)
 	if valErr != nil {
 		err = valErr
 		return

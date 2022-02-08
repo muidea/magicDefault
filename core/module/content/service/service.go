@@ -67,6 +67,12 @@ func (s *Content) RegisterRoute() {
 	s.roleRouteRegistry.AddHandler(common.UpdateContentCatalog, "PUT", cc.WritePrivate, s.UpdateCatalog)
 	s.roleRouteRegistry.AddHandler(common.DeleteContentCatalog, "DELETE", cc.DeletePrivate, s.DeleteCatalog)
 
+	s.roleRouteRegistry.AddHandler(common.FilterContentComment, "GET", cc.ReadPrivate, s.FilterComment)
+	s.roleRouteRegistry.AddHandler(common.QueryContentComment, "GET", cc.ReadPrivate, s.QueryComment)
+	s.roleRouteRegistry.AddHandler(common.CreateContentComment, "POST", cc.WritePrivate, s.CreateComment)
+	s.roleRouteRegistry.AddHandler(common.UpdateContentComment, "PUT", cc.WritePrivate, s.UpdateComment)
+	s.roleRouteRegistry.AddHandler(common.DeleteContentComment, "DELETE", cc.DeletePrivate, s.DeleteComment)
+
 	s.roleRouteRegistry.AddHandler(common.FilterContentLink, "GET", cc.ReadPrivate, s.FilterLink)
 	s.roleRouteRegistry.AddHandler(common.QueryContentLink, "GET", cc.ReadPrivate, s.QueryLink)
 	s.roleRouteRegistry.AddHandler(common.CreateContentLink, "POST", cc.WritePrivate, s.CreateLink)
@@ -78,12 +84,6 @@ func (s *Content) RegisterRoute() {
 	s.roleRouteRegistry.AddHandler(common.CreateContentMedia, "POST", cc.WritePrivate, s.CreateMedia)
 	s.roleRouteRegistry.AddHandler(common.UpdateContentMedia, "PUT", cc.WritePrivate, s.UpdateMedia)
 	s.roleRouteRegistry.AddHandler(common.DeleteContentMedia, "DELETE", cc.DeletePrivate, s.DeleteMedia)
-
-	s.roleRouteRegistry.AddHandler(common.FilterContentComment, "GET", cc.ReadPrivate, s.FilterComment)
-	s.roleRouteRegistry.AddHandler(common.QueryContentComment, "GET", cc.ReadPrivate, s.QueryComment)
-	s.roleRouteRegistry.AddHandler(common.CreateContentComment, "POST", cc.WritePrivate, s.CreateComment)
-	s.roleRouteRegistry.AddHandler(common.UpdateContentComment, "PUT", cc.WritePrivate, s.UpdateComment)
-	s.roleRouteRegistry.AddHandler(common.DeleteContentComment, "DELETE", cc.DeletePrivate, s.DeleteComment)
 
 }
 
