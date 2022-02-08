@@ -46,35 +46,68 @@ const (
 )
 
 type ArticleView struct {
-	// TODO
+	ID         int            `json:"id"`
+	Title      string         `json:"title"`
+	Content    string         `json:"content"`
+	Catalog    []*CatalogLite `json:"catalog"`
+	Creater    *cc.EntityView `json:"creater"`
+	UpdateTime int64          `json:"updateTime"`
 }
 
 func (s *ArticleView) FromArticle(ptr *model.Article, entityPtr *cc.EntityView) {
-	// TODO
+	s.ID = ptr.ID
+	s.Title = ptr.Title
+	s.Content = ptr.Content
+	for _, val := range ptr.Catalog {
+		lite := &CatalogLite{}
+		lite.FromCatalog(val)
+		s.Catalog = append(s.Catalog, lite)
+	}
+	s.Creater = entityPtr
+	s.UpdateTime = ptr.UpdateTime
 	return
 }
 
 type ArticleLite struct {
-	// TODO
+	ID      int    `json:"id"`
+	Title   string `json:"title"`
+	Content string `json:"content"`
 }
 
 func (s *ArticleLite) FromArticle(ptr *model.Article) {
-	// TODO
+	s.ID = ptr.ID
+	s.Title = ptr.Title
+	s.Content = ptr.Content
 	return
 }
 
 func (s *ArticleLite) FromView(ptr *ArticleView) {
-	// TODO
+	s.ID = ptr.ID
+	s.Title = ptr.Title
+	s.Content = ptr.Content
 	return
 }
 
 func (s *ArticleLite) ToArticle() (ret *model.Article) {
-	// TODO
+	ptr := &model.Article{Catalog: []*model.Catalog{}}
+	if s.ID != 0 {
+		ptr.ID = s.ID
+	}
+	if s.Title != "" {
+		ptr.Title = s.Title
+	}
+	if s.Content != "" {
+		ptr.Content = s.Content
+	}
+	ret = ptr
 	return
 }
 
 type ArticleParam struct {
-	// TODO
+	ID      int            `json:"id"`
+	Title   string         `json:"title"`
+	Content string         `json:"content"`
+	Catalog []*CatalogLite `json:"catalog"`
 }
 
 func (s *ArticleParam) ToArticle(ptr *model.Article) (ret *model.Article) {
@@ -82,7 +115,16 @@ func (s *ArticleParam) ToArticle(ptr *model.Article) (ret *model.Article) {
 		ptr = &model.Article{Catalog: []*model.Catalog{}}
 	}
 
-	// TODO
+	if s.Title != "" {
+		ptr.Title = s.Title
+	}
+	if s.Content != "" {
+		ptr.Content = s.Content
+	}
+	for _, val := range s.Catalog {
+		ptr.Catalog = append(ptr.Catalog, val.ToCatalog())
+	}
+
 	ret = ptr
 	return
 }
@@ -110,35 +152,65 @@ type ArticleStatisticResult struct {
 }
 
 type CatalogView struct {
-	// TODO
+	ID          int            `json:"id"`
+	Name        string         `json:"name"`
+	Description string         `json:"description"`
+	Catalog     *CatalogLite   `json:"catalog"`
+	Creater     *cc.EntityView `json:"creater"`
+	UpdateTime  int64          `json:"updateTime"`
 }
 
 func (s *CatalogView) FromCatalog(ptr *model.Catalog, entityPtr *cc.EntityView) {
-	// TODO
+	s.ID = ptr.ID
+	s.Name = ptr.Name
+	s.Description = ptr.Description
+	s.Catalog = &CatalogLite{}
+	s.Catalog.FromCatalog(ptr.Catalog)
+	s.Creater = entityPtr
+	s.UpdateTime = ptr.UpdateTime
 	return
 }
 
 type CatalogLite struct {
-	// TODO
+	ID          int    `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
 func (s *CatalogLite) FromCatalog(ptr *model.Catalog) {
-	// TODO
+	s.ID = ptr.ID
+	s.Name = ptr.Name
+	s.Description = ptr.Description
 	return
 }
 
 func (s *CatalogLite) FromView(ptr *CatalogView) {
-	// TODO
+	s.ID = ptr.ID
+	s.Name = ptr.Name
+	s.Description = ptr.Description
 	return
 }
 
 func (s *CatalogLite) ToCatalog() (ret *model.Catalog) {
-	// TODO
+	ptr := &model.Catalog{Catalog: &model.Catalog{}}
+	if s.ID != 0 {
+		ptr.ID = s.ID
+	}
+	if s.Name != "" {
+		ptr.Name = s.Name
+	}
+	if s.Description != "" {
+		ptr.Description = s.Description
+	}
+	ret = ptr
 	return
 }
 
 type CatalogParam struct {
-	// TODO
+	ID          int          `json:"id"`
+	Name        string       `json:"name"`
+	Description string       `json:"description"`
+	Catalog     *CatalogLite `json:"catalog"`
 }
 
 func (s *CatalogParam) ToCatalog(ptr *model.Catalog) (ret *model.Catalog) {
@@ -146,7 +218,16 @@ func (s *CatalogParam) ToCatalog(ptr *model.Catalog) (ret *model.Catalog) {
 		ptr = &model.Catalog{Catalog: &model.Catalog{}}
 	}
 
-	// TODO
+	if s.Name != "" {
+		ptr.Name = s.Name
+	}
+	if s.Description != "" {
+		ptr.Description = s.Description
+	}
+	if s.Catalog != nil {
+		ptr.Catalog = s.Catalog.ToCatalog()
+	}
+
 	ret = ptr
 	return
 }
@@ -174,35 +255,74 @@ type CatalogStatisticResult struct {
 }
 
 type LinkView struct {
-	// TODO
+	ID          int            `json:"id"`
+	Name        string         `json:"name"`
+	Description string         `json:"description"`
+	URL         string         `json:"url"`
+	Logo        string         `json:"logo"`
+	Catalog     []*CatalogLite `json:"catalog"`
+	Creater     *cc.EntityView `json:"creater"`
+	UpdateTime  int64          `json:"updateTime"`
 }
 
 func (s *LinkView) FromLink(ptr *model.Link, entityPtr *cc.EntityView) {
-	// TODO
+	s.ID = ptr.ID
+	s.Name = ptr.Name
+	s.Description = ptr.Description
+	s.URL = ptr.URL
+	s.Logo = ptr.Logo
+	for _, val := range ptr.Catalog {
+		lite := &CatalogLite{}
+		lite.FromCatalog(val)
+		s.Catalog = append(s.Catalog, lite)
+	}
+	s.Creater = entityPtr
+	s.UpdateTime = ptr.UpdateTime
 	return
 }
 
 type LinkLite struct {
-	// TODO
+	ID          int    `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
 func (s *LinkLite) FromLink(ptr *model.Link) {
-	// TODO
+	s.ID = ptr.ID
+	s.Name = ptr.Name
+	s.Description = ptr.Description
 	return
 }
 
 func (s *LinkLite) FromView(ptr *LinkView) {
-	// TODO
+	s.ID = ptr.ID
+	s.Name = ptr.Name
+	s.Description = ptr.Description
 	return
 }
 
 func (s *LinkLite) ToLink() (ret *model.Link) {
-	// TODO
+	ptr := &model.Link{Catalog: []*model.Catalog{}}
+	if s.ID != 0 {
+		ptr.ID = s.ID
+	}
+	if s.Name != "" {
+		ptr.Name = s.Name
+	}
+	if s.Description != "" {
+		ptr.Description = s.Description
+	}
+	ret = ptr
 	return
 }
 
 type LinkParam struct {
-	// TODO
+	ID          int            `json:"id"`
+	Name        string         `json:"name"`
+	Description string         `json:"description"`
+	URL         string         `json:"url"`
+	Logo        string         `json:"logo"`
+	Catalog     []*CatalogLite `json:"catalog"`
 }
 
 func (s *LinkParam) ToLink(ptr *model.Link) (ret *model.Link) {
@@ -210,7 +330,22 @@ func (s *LinkParam) ToLink(ptr *model.Link) (ret *model.Link) {
 		ptr = &model.Link{Catalog: []*model.Catalog{}}
 	}
 
-	// TODO
+	if s.Name != "" {
+		ptr.Name = s.Name
+	}
+	if s.Description != "" {
+		ptr.Description = s.Description
+	}
+	if s.URL != "" {
+		ptr.URL = s.URL
+	}
+	if s.Logo != "" {
+		ptr.Logo = s.Logo
+	}
+	for _, val := range s.Catalog {
+		ptr.Catalog = append(ptr.Catalog, val.ToCatalog())
+	}
+
 	ret = ptr
 	return
 }
@@ -238,35 +373,77 @@ type LinkStatisticResult struct {
 }
 
 type MediaView struct {
-	// TODO
+	ID          int            `json:"id"`
+	Name        string         `json:"name"`
+	Description string         `json:"description"`
+	FileToken   string         `json:"fileToken"`
+	Expiration  int            `json:"expiration"`
+	Tags        []string       `json:"tags"`
+	Catalog     []*CatalogLite `json:"catalog"`
+	Creater     *cc.EntityView `json:"creater"`
+	UpdateTime  int64          `json:"updateTime"`
 }
 
 func (s *MediaView) FromMedia(ptr *model.Media, entityPtr *cc.EntityView) {
-	// TODO
+	s.ID = ptr.ID
+	s.Name = ptr.Name
+	s.Description = ptr.Description
+	s.FileToken = ptr.FileToken
+	s.Expiration = ptr.Expiration
+	s.Tags = ptr.Tags
+	for _, val := range ptr.Catalog {
+		lite := &CatalogLite{}
+		lite.FromCatalog(val)
+		s.Catalog = append(s.Catalog, lite)
+	}
+	s.Creater = entityPtr
+	s.UpdateTime = ptr.UpdateTime
 	return
 }
 
 type MediaLite struct {
-	// TODO
+	ID          int    `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
 func (s *MediaLite) FromMedia(ptr *model.Media) {
-	// TODO
+	s.ID = ptr.ID
+	s.Name = ptr.Name
+	s.Description = ptr.Description
 	return
 }
 
 func (s *MediaLite) FromView(ptr *MediaView) {
-	// TODO
+	s.ID = ptr.ID
+	s.Name = ptr.Name
+	s.Description = ptr.Description
 	return
 }
 
 func (s *MediaLite) ToMedia() (ret *model.Media) {
-	// TODO
+	ptr := &model.Media{Catalog: []*model.Catalog{}}
+	if s.ID != 0 {
+		ptr.ID = s.ID
+	}
+	if s.Name != "" {
+		ptr.Name = s.Name
+	}
+	if s.Description != "" {
+		ptr.Description = s.Description
+	}
+	ret = ptr
 	return
 }
 
 type MediaParam struct {
-	// TODO
+	ID          int            `json:"id"`
+	Name        string         `json:"name"`
+	Description string         `json:"description"`
+	FileToken   string         `json:"fileToken"`
+	Expiration  int            `json:"expiration"`
+	Tags        []string       `json:"tags"`
+	Catalog     []*CatalogLite `json:"catalog"`
 }
 
 func (s *MediaParam) ToMedia(ptr *model.Media) (ret *model.Media) {
@@ -274,7 +451,25 @@ func (s *MediaParam) ToMedia(ptr *model.Media) (ret *model.Media) {
 		ptr = &model.Media{Catalog: []*model.Catalog{}}
 	}
 
-	// TODO
+	if s.Name != "" {
+		ptr.Name = s.Name
+	}
+	if s.Description != "" {
+		ptr.Description = s.Description
+	}
+	if s.FileToken != "" {
+		ptr.FileToken = s.FileToken
+	}
+	if s.Expiration != 0 {
+		ptr.Expiration = s.Expiration
+	}
+	if len(s.Tags) > 0 {
+		ptr.Tags = s.Tags
+	}
+	for _, val := range s.Catalog {
+		ptr.Catalog = append(ptr.Catalog, val.ToCatalog())
+	}
+
 	ret = ptr
 	return
 }
@@ -302,35 +497,61 @@ type MediaStatisticResult struct {
 }
 
 type CommentView struct {
-	// TODO
+	ID         int            `json:"id"`
+	Content    string         `json:"content"`
+	Flag       int            `json:"flag"`
+	Creater    *cc.EntityView `json:"creater"`
+	UpdateTime int64          `json:"updateTime"`
 }
 
 func (s *CommentView) FromComment(ptr *model.Comment, entityPtr *cc.EntityView) {
-	// TODO
+	s.ID = ptr.ID
+	s.Content = ptr.Content
+	s.Flag = ptr.Flag
+	s.Creater = entityPtr
+	s.UpdateTime = ptr.UpdateTime
 	return
 }
 
 type CommentLite struct {
-	// TODO
+	ID      int    `json:"id"`
+	Content string `json:"content"`
+	Flag    int    `json:"flag"`
 }
 
 func (s *CommentLite) FromComment(ptr *model.Comment) {
-	// TODO
+	s.ID = ptr.ID
+	s.Content = ptr.Content
+	s.Flag = ptr.Flag
 	return
 }
 
 func (s *CommentLite) FromView(ptr *CommentView) {
-	// TODO
+	s.ID = ptr.ID
+	s.Content = ptr.Content
+	s.Flag = ptr.Flag
 	return
 }
 
 func (s *CommentLite) ToComment() (ret *model.Comment) {
-	// TODO
+	ptr := &model.Comment{}
+	if s.ID != 0 {
+		ptr.ID = s.ID
+	}
+	if s.Content != "" {
+		ptr.Content = s.Content
+	}
+	if s.Flag != 0 {
+		ptr.Flag = s.Flag
+	}
+	ret = ptr
 	return
 }
 
 type CommentParam struct {
-	// TODO
+	ID      int    `json:"id"`
+	Content string `json:"content"`
+	Flag    int    `json:"flag"`
 }
 
 func (s *CommentParam) ToComment(ptr *model.Comment) (ret *model.Comment) {
@@ -338,7 +559,13 @@ func (s *CommentParam) ToComment(ptr *model.Comment) (ret *model.Comment) {
 		ptr = &model.Comment{}
 	}
 
-	// TODO
+	if s.Content != "" {
+		ptr.Content = s.Content
+	}
+	if s.Flag != 0 {
+		ptr.Flag = s.Flag
+	}
+
 	ret = ptr
 	return
 }
