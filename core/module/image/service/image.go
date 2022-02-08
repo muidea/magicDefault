@@ -3,16 +3,13 @@ package service
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net"
 	"net/http"
 	"strings"
-	"time"
 
 	cd "github.com/muidea/magicCommon/def"
 	fn "github.com/muidea/magicCommon/foundation/net"
 	fu "github.com/muidea/magicCommon/foundation/util"
-	"github.com/muidea/magicCommon/session"
 
 	cc "github.com/muidea/magicCas/common"
 	"github.com/muidea/magicCas/toolkit"
@@ -21,7 +18,6 @@ import (
 
 	"github.com/muidea/magicDefault/common"
 	"github.com/muidea/magicDefault/core/module/image/biz"
-	"github.com/muidea/magicDefault/model"
 )
 
 type Image struct {
@@ -207,17 +203,6 @@ func (s *Image) DeleteImage(ctx context.Context, res http.ResponseWriter, req *h
 	res.WriteHeader(http.StatusExpectationFailed)
 }
 
-func (s *Image) getCurrentEntity(ctx context.Context, res http.ResponseWriter, req *http.Request) (ret *cc.EntityView, err error) {
-	curSession := ctx.Value(session.AuthSession).(session.Session)
-	authVal, ok := curSession.GetOption(session.AuthAccount)
-	if !ok {
-		err = fmt.Errorf("无效权限,未通过验证")
-		return
-	}
-	ret = authVal.(*cc.EntityView)
-	return
-}
-
 func (s *Image) getCurrentNamespace(ctx context.Context, res http.ResponseWriter, req *http.Request) (ret string) {
 	namespace := req.Header.Get(cc.NamespaceID)
 	if namespace != "" {
@@ -239,17 +224,4 @@ func (s *Image) getCurrentNamespace(ctx context.Context, res http.ResponseWriter
 
 	ret = items[0]
 	return
-}
-
-func (s *Image) queryEntity(sessionInfo *session.SessionInfo, id int, namespace string) (ret *cc.EntityView) {
-	ret = s.bizPtr.QueryEntity(sessionInfo, id, namespace)
-	return
-}
-
-func (s *Image) writeLog(ctx context.Context, res http.ResponseWriter, req *http.Request, memo string) {
-	address := fn.GetHTTPRemoteAddress(req)
-	curEntity, _ := s.getCurrentEntity(ctx, res, req)
-	curNamespace := s.getCurrentNamespace(ctx, res, req)
-	logPtr := &model.Log{Address: address, Memo: memo, Creater: curEntity.ID, CreateTime: time.Now().UTC().Unix()}
-	s.bizPtr.WriteLog(logPtr, curNamespace)
 }

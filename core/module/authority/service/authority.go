@@ -6,18 +6,16 @@ import (
 	"net"
 	"net/http"
 	"strings"
-	"time"
 
 	fn "github.com/muidea/magicCommon/foundation/net"
 	fu "github.com/muidea/magicCommon/foundation/util"
+	"github.com/muidea/magicCommon/session"
 
 	cc "github.com/muidea/magicCas/common"
 	"github.com/muidea/magicCas/toolkit"
-	"github.com/muidea/magicCommon/session"
 
 	"github.com/muidea/magicDefault/common"
 	"github.com/muidea/magicDefault/core/module/authority/biz"
-	"github.com/muidea/magicDefault/model"
 )
 
 type Authority struct {
@@ -82,7 +80,7 @@ func (s *Authority) RegisterRoute() {
 	s.roleRouteRegistry.AddHandler(common.DeleteAuthorityNamespace, "DELETE", cc.DeletePrivate, s.DeleteAuthorityNamespace)
 }
 
-func (s *Authority) getCurrentEntity(ctx context.Context, res http.ResponseWriter, req *http.Request) (ret *cc.EntityView, err error) {
+func (s *Authority) getCurrentEntity(ctx context.Context) (ret *cc.EntityView, err error) {
 	curSession := ctx.Value(session.AuthSession).(session.Session)
 	authVal, ok := curSession.GetOption(session.AuthAccount)
 	if !ok {
@@ -116,15 +114,9 @@ func (s *Authority) getCurrentNamespace(ctx context.Context, res http.ResponseWr
 	return
 }
 
-func (s *Authority) queryEntity(sessionInfo *session.SessionInfo, id int, namespace string) (ret *cc.EntityView) {
-	ret = s.bizPtr.QueryEntity(sessionInfo, id, namespace)
-	return
-}
-
 func (s *Authority) writeLog(ctx context.Context, res http.ResponseWriter, req *http.Request, memo string) {
 	address := fn.GetHTTPRemoteAddress(req)
-	curEntity, _ := s.getCurrentEntity(ctx, res, req)
-	curNamespace := s.getCurrentNamespace(ctx, res, req)
-	logPtr := &model.Log{Address: address, Memo: memo, Creater: curEntity.ID, CreateTime: time.Now().UTC().Unix()}
-	s.bizPtr.WriteLog(logPtr, curNamespace)
+	entityPtr, _ := s.getCurrentEntity(ctx)
+	namespace := s.getCurrentNamespace(ctx, res, req)
+	s.bizPtr.WriteLog(memo, address, entityPtr, namespace)
 }

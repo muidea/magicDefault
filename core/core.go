@@ -27,7 +27,9 @@ import (
 	_ "github.com/muidea/magicDefault/core/kernel/setting"
 	_ "github.com/muidea/magicDefault/core/kernel/totalizer"
 	_ "github.com/muidea/magicDefault/core/module/authority"
+	_ "github.com/muidea/magicDefault/core/module/content"
 	_ "github.com/muidea/magicDefault/core/module/image"
+	_ "github.com/muidea/magicDefault/core/module/remoteHub"
 )
 
 type loadNamespaceTask struct {

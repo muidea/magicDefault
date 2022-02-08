@@ -6,7 +6,6 @@ import (
 	"net"
 	"net/http"
 	"strings"
-	"time"
 
 	fn "github.com/muidea/magicCommon/foundation/net"
 	fu "github.com/muidea/magicCommon/foundation/util"
@@ -17,7 +16,6 @@ import (
 
 	"github.com/muidea/magicDefault/common"
 	"github.com/muidea/magicDefault/core/module/remoteHub/biz"
-	"github.com/muidea/magicDefault/model"
 )
 
 type RemoteHub struct {
@@ -28,18 +26,14 @@ type RemoteHub struct {
 	validator fu.Validator
 
 	bizPtr *biz.RemoteHub
-
-	endpointName string
 }
 
 func New(
-	endpointName string,
 	bizPtr *biz.RemoteHub,
 ) *RemoteHub {
 	ptr := &RemoteHub{
-		bizPtr:       bizPtr,
-		endpointName: endpointName,
-		validator:    fu.NewFormValidator(),
+		bizPtr:    bizPtr,
+		validator: fu.NewFormValidator(),
 	}
 
 	return ptr
@@ -63,7 +57,7 @@ func (s *RemoteHub) BindRegistry(
 func (s *RemoteHub) RegisterRoute() {
 }
 
-func (s *RemoteHub) getCurrentEntity(ctx context.Context, res http.ResponseWriter, req *http.Request) (ret *cc.EntityView, err error) {
+func (s *RemoteHub) getCurrentEntity(ctx context.Context) (ret *cc.EntityView, err error) {
 	curSession := ctx.Value(session.AuthSession).(session.Session)
 	authVal, ok := curSession.GetOption(session.AuthAccount)
 	if !ok {
@@ -104,8 +98,7 @@ func (s *RemoteHub) queryEntity(sessionInfo *session.SessionInfo, id int, namesp
 
 func (s *RemoteHub) writeLog(ctx context.Context, res http.ResponseWriter, req *http.Request, memo string) {
 	address := fn.GetHTTPRemoteAddress(req)
-	curEntity, _ := s.getCurrentEntity(ctx, res, req)
-	curNamespace := s.getCurrentNamespace(ctx, res, req)
-	logPtr := &model.Log{Address: address, Memo: memo, Creater: curEntity.ID, CreateTime: time.Now().UTC().Unix()}
-	s.bizPtr.WriteLog(logPtr, curNamespace)
+	entityPtr, _ := s.getCurrentEntity(ctx)
+	namespace := s.getCurrentNamespace(ctx, res, req)
+	s.bizPtr.WriteLog(memo, address, entityPtr, namespace)
 }

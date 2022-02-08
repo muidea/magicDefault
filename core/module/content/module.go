@@ -1,4 +1,4 @@
-package remoteHub
+package content
 
 import (
 	"github.com/muidea/magicBatis/client"
@@ -9,37 +9,37 @@ import (
 	"github.com/muidea/magicCas/toolkit"
 
 	"github.com/muidea/magicDefault/common"
-	"github.com/muidea/magicDefault/core/module/remoteHub/biz"
-	"github.com/muidea/magicDefault/core/module/remoteHub/service"
+	"github.com/muidea/magicDefault/core/module/content/biz"
+	"github.com/muidea/magicDefault/core/module/content/service"
 )
 
 func init() {
 	module.Register(New())
 }
 
-type RemoteHub struct {
+type Content struct {
 	batisClient       client.Client
 	routeRegistry     toolkit.RouteRegistry
 	casRouteRegistry  toolkit.CasRegistry
 	roleRouteRegistry toolkit.RoleRegistry
 
-	service *service.RemoteHub
-	biz     *biz.RemoteHub
+	service *service.Content
+	biz     *biz.Content
 }
 
-func New() *RemoteHub {
-	return &RemoteHub{}
+func New() *Content {
+	return &Content{}
 }
 
-func (s *RemoteHub) ID() string {
-	return common.RemoteHubModule
+func (s *Content) ID() string {
+	return common.ContentModule
 }
 
-func (s *RemoteHub) BindBatisClient(clnt client.Client) {
+func (s *Content) BindBatisClient(clnt client.Client) {
 	s.batisClient = clnt
 }
 
-func (s *RemoteHub) BindRegistry(
+func (s *Content) BindRegistry(
 	routeRegistry toolkit.RouteRegistry,
 	casRouteRegistry toolkit.CasRegistry,
 	roleRouteRegistry toolkit.RoleRegistry) {
@@ -53,7 +53,7 @@ func (s *RemoteHub) BindRegistry(
 	s.roleRouteRegistry.SetApiVersion(common.ApiVersion)
 }
 
-func (s *RemoteHub) Setup(
+func (s *Content) Setup(
 	endpointName string,
 	eventHub event.Hub,
 	backgroundRoutine task.BackgroundRoutine) {
@@ -68,6 +68,6 @@ func (s *RemoteHub) Setup(
 	s.service.RegisterRoute()
 }
 
-func (s *RemoteHub) Teardown() {
+func (s *Content) Teardown() {
 
 }
