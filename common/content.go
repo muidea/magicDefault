@@ -77,8 +77,13 @@ type ArticleParam struct {
 	// TODO
 }
 
-func (s *ArticleParam) ToArticle() (ret *model.Article) {
+func (s *ArticleParam) ToArticle(ptr *model.Article) (ret *model.Article) {
+	if ptr == nil {
+		ptr = &model.Article{Catalog: []*model.Catalog{}}
+	}
+
 	// TODO
+	ret = ptr
 	return
 }
 
@@ -136,8 +141,13 @@ type CatalogParam struct {
 	// TODO
 }
 
-func (s *CatalogParam) ToCatalog() (ret *model.Catalog) {
+func (s *CatalogParam) ToCatalog(ptr *model.Catalog) (ret *model.Catalog) {
+	if ptr == nil {
+		ptr = &model.Catalog{Catalog: &model.Catalog{}}
+	}
+
 	// TODO
+	ret = ptr
 	return
 }
 
@@ -195,8 +205,13 @@ type LinkParam struct {
 	// TODO
 }
 
-func (s *LinkParam) ToLink() (ret *model.Link) {
+func (s *LinkParam) ToLink(ptr *model.Link) (ret *model.Link) {
+	if ptr == nil {
+		ptr = &model.Link{Catalog: []*model.Catalog{}}
+	}
+
 	// TODO
+	ret = ptr
 	return
 }
 
@@ -254,8 +269,13 @@ type MediaParam struct {
 	// TODO
 }
 
-func (s *MediaParam) ToMedia() (ret *model.Media) {
+func (s *MediaParam) ToMedia(ptr *model.Media) (ret *model.Media) {
+	if ptr == nil {
+		ptr = &model.Media{Catalog: []*model.Catalog{}}
+	}
+
 	// TODO
+	ret = ptr
 	return
 }
 
@@ -313,8 +333,13 @@ type CommentParam struct {
 	// TODO
 }
 
-func (s *CommentParam) ToComment() (ret *model.Comment) {
+func (s *CommentParam) ToComment(ptr *model.Comment) (ret *model.Comment) {
+	if ptr == nil {
+		ptr = &model.Comment{}
+	}
+
 	// TODO
+	ret = ptr
 	return
 }
 

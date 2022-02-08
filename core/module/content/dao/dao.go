@@ -54,6 +54,7 @@ func (s *content) FilterArticle(filter *bc.QueryFilter, namespace string) (ret [
 		filter = bc.NewFilter()
 	}
 	filter.Equal("Namespace", namespace)
+	filter.ValueMask(&model.Article{Catalog: []*model.Catalog{}})
 	total, err = s.batisClient.BatchQueryEntity(&ret, filter)
 	return
 }
@@ -63,7 +64,7 @@ func (s *content) QueryArticle(id int, namespace string) (ret *model.Article, er
 		err = fmt.Errorf("illegal id value, id:%d", id)
 		return
 	}
-	ptr := &model.Article{ID: id, Namespace: namespace}
+	ptr := &model.Article{Catalog: []*model.Catalog{}}
 	ptr.ID = id
 	ptr.Namespace = namespace
 	err = s.batisClient.QueryEntity(ptr)
@@ -122,6 +123,7 @@ func (s *content) FilterCatalog(filter *bc.QueryFilter, namespace string) (ret [
 		filter = bc.NewFilter()
 	}
 	filter.Equal("Namespace", namespace)
+	filter.ValueMask(&model.Catalog{Catalog: &model.Catalog{}})
 	total, err = s.batisClient.BatchQueryEntity(&ret, filter)
 	return
 }
@@ -131,7 +133,7 @@ func (s *content) QueryCatalog(id int, namespace string) (ret *model.Catalog, er
 		err = fmt.Errorf("illegal id value, id:%d", id)
 		return
 	}
-	ptr := &model.Catalog{ID: id, Namespace: namespace}
+	ptr := &model.Catalog{Catalog: &model.Catalog{}}
 	ptr.ID = id
 	ptr.Namespace = namespace
 	err = s.batisClient.QueryEntity(ptr)
@@ -190,6 +192,7 @@ func (s *content) FilterLink(filter *bc.QueryFilter, namespace string) (ret []*m
 		filter = bc.NewFilter()
 	}
 	filter.Equal("Namespace", namespace)
+	filter.ValueMask(&model.Link{Catalog: []*model.Catalog{}})
 	total, err = s.batisClient.BatchQueryEntity(&ret, filter)
 	return
 }
@@ -199,7 +202,7 @@ func (s *content) QueryLink(id int, namespace string) (ret *model.Link, err erro
 		err = fmt.Errorf("illegal id value, id:%d", id)
 		return
 	}
-	ptr := &model.Link{ID: id, Namespace: namespace}
+	ptr := &model.Link{Catalog: []*model.Catalog{}}
 	ptr.ID = id
 	ptr.Namespace = namespace
 	err = s.batisClient.QueryEntity(ptr)
@@ -258,6 +261,7 @@ func (s *content) FilterMedia(filter *bc.QueryFilter, namespace string) (ret []*
 		filter = bc.NewFilter()
 	}
 	filter.Equal("Namespace", namespace)
+	filter.ValueMask(&model.Media{Catalog: []*model.Catalog{}})
 	total, err = s.batisClient.BatchQueryEntity(&ret, filter)
 	return
 }
@@ -267,7 +271,7 @@ func (s *content) QueryMedia(id int, namespace string) (ret *model.Media, err er
 		err = fmt.Errorf("illegal id value, id:%d", id)
 		return
 	}
-	ptr := &model.Media{ID: id, Namespace: namespace}
+	ptr := &model.Media{Catalog: []*model.Catalog{}}
 	ptr.ID = id
 	ptr.Namespace = namespace
 	err = s.batisClient.QueryEntity(ptr)
@@ -326,6 +330,7 @@ func (s *content) FilterComment(filter *bc.QueryFilter, namespace string) (ret [
 		filter = bc.NewFilter()
 	}
 	filter.Equal("Namespace", namespace)
+	filter.ValueMask(&model.Comment{})
 	total, err = s.batisClient.BatchQueryEntity(&ret, filter)
 	return
 }
@@ -335,7 +340,7 @@ func (s *content) QueryComment(id int, namespace string) (ret *model.Comment, er
 		err = fmt.Errorf("illegal id value, id:%d", id)
 		return
 	}
-	ptr := &model.Comment{ID: id, Namespace: namespace}
+	ptr := &model.Comment{}
 	ptr.ID = id
 	ptr.Namespace = namespace
 	err = s.batisClient.QueryEntity(ptr)

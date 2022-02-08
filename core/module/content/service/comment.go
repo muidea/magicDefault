@@ -94,12 +94,12 @@ func (s *Content) FilterComment(ctx context.Context, res http.ResponseWriter, re
 
 	modelVal, modelOK := filter.Get("mode")
 	if modelOK {
-		if modelVal == "1" {
+		if modelVal == common.LiteMode {
 			s.filterCommentLite(ctx, res, req, queryFilter)
 			return
 		}
 
-		if modelVal == "2" {
+		if modelVal == common.ViewMode {
 			s.filterComment(ctx, res, req, queryFilter)
 			return
 		}

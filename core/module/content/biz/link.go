@@ -23,7 +23,7 @@ func (s *Content) QueryLink(id int, namespace string) (ret *model.Link, err erro
 }
 
 func (s *Content) CreateLink(ptr *common.LinkParam, creater int, namespace string) (ret *model.Link, err error) {
-	linkPtr := ptr.ToLink()
+	linkPtr := ptr.ToLink(nil)
 	linkPtr.Creater = creater
 	linkPtr.UpdateTime = time.Now().UTC().Unix()
 	ret, err = s.contentDao.CreateLink(linkPtr, namespace)
@@ -45,9 +45,9 @@ func (s *Content) UpdateLink(id int, ptr *common.LinkParam, updater int, namespa
 		return
 	}
 
+	currentLink = ptr.ToLink(currentLink)
 	currentLink.Creater = updater
 	currentLink.UpdateTime = time.Now().UTC().Unix()
-
 	ret, err = s.contentDao.UpdateLink(currentLink, namespace)
 	if err != nil {
 		return

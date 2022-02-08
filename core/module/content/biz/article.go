@@ -23,7 +23,7 @@ func (s *Content) QueryArticle(id int, namespace string) (ret *model.Article, er
 }
 
 func (s *Content) CreateArticle(ptr *common.ArticleParam, creater int, namespace string) (ret *model.Article, err error) {
-	articlePtr := ptr.ToArticle()
+	articlePtr := ptr.ToArticle(nil)
 	articlePtr.Creater = creater
 	articlePtr.UpdateTime = time.Now().UTC().Unix()
 	ret, err = s.contentDao.CreateArticle(articlePtr, namespace)
@@ -45,9 +45,9 @@ func (s *Content) UpdateArticle(id int, ptr *common.ArticleParam, updater int, n
 		return
 	}
 
+	currentArticle = ptr.ToArticle(currentArticle)
 	currentArticle.Creater = updater
 	currentArticle.UpdateTime = time.Now().UTC().Unix()
-
 	ret, err = s.contentDao.UpdateArticle(currentArticle, namespace)
 	if err != nil {
 		return

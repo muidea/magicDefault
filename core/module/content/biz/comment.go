@@ -23,7 +23,7 @@ func (s *Content) QueryComment(id int, namespace string) (ret *model.Comment, er
 }
 
 func (s *Content) CreateComment(ptr *common.CommentParam, creater int, namespace string) (ret *model.Comment, err error) {
-	commentPtr := ptr.ToComment()
+	commentPtr := ptr.ToComment(nil)
 	commentPtr.Creater = creater
 	commentPtr.UpdateTime = time.Now().UTC().Unix()
 	ret, err = s.contentDao.CreateComment(commentPtr, namespace)
@@ -45,9 +45,9 @@ func (s *Content) UpdateComment(id int, ptr *common.CommentParam, updater int, n
 		return
 	}
 
+	currentComment = ptr.ToComment(currentComment)
 	currentComment.Creater = updater
 	currentComment.UpdateTime = time.Now().UTC().Unix()
-
 	ret, err = s.contentDao.UpdateComment(currentComment, namespace)
 	if err != nil {
 		return
