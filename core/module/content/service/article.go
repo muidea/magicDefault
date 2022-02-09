@@ -61,7 +61,6 @@ func (s *Content) filterArticle(ctx context.Context, res http.ResponseWriter, re
 
 		for _, val := range articleList {
 			ptr := &common.ArticleView{}
-
 			entityPtr := s.queryEntity(curSession.GetSessionInfo(), val.Creater, curNamespace)
 			ptr.FromArticle(val, entityPtr)
 			result.Article = append(result.Article, ptr)

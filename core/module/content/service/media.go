@@ -61,7 +61,6 @@ func (s *Content) filterMedia(ctx context.Context, res http.ResponseWriter, req 
 
 		for _, val := range mediaList {
 			ptr := &common.MediaView{}
-
 			entityPtr := s.queryEntity(curSession.GetSessionInfo(), val.Creater, curNamespace)
 			ptr.FromMedia(val, entityPtr)
 			result.Media = append(result.Media, ptr)

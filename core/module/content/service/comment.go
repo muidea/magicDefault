@@ -61,7 +61,6 @@ func (s *Content) filterComment(ctx context.Context, res http.ResponseWriter, re
 
 		for _, val := range commentList {
 			ptr := &common.CommentView{}
-
 			entityPtr := s.queryEntity(curSession.GetSessionInfo(), val.Creater, curNamespace)
 			ptr.FromComment(val, entityPtr)
 			result.Comment = append(result.Comment, ptr)

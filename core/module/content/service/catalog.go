@@ -61,7 +61,6 @@ func (s *Content) filterCatalog(ctx context.Context, res http.ResponseWriter, re
 
 		for _, val := range catalogList {
 			ptr := &common.CatalogView{}
-
 			entityPtr := s.queryEntity(curSession.GetSessionInfo(), val.Creater, curNamespace)
 			ptr.FromCatalog(val, entityPtr)
 			result.Catalog = append(result.Catalog, ptr)

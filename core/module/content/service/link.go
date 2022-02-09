@@ -61,7 +61,6 @@ func (s *Content) filterLink(ctx context.Context, res http.ResponseWriter, req *
 
 		for _, val := range linkList {
 			ptr := &common.LinkView{}
-
 			entityPtr := s.queryEntity(curSession.GetSessionInfo(), val.Creater, curNamespace)
 			ptr.FromLink(val, entityPtr)
 			result.Link = append(result.Link, ptr)
