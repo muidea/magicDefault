@@ -1,7 +1,6 @@
 package biz
 
 import (
-	"path"
 	"time"
 
 	bc "github.com/muidea/magicBatis/common"
@@ -109,58 +108,13 @@ func (s *Base) WriteLog(memo, address string, entityPtr *cc.EntityView, namespac
 	return
 }
 
-func (s *Base) CheckIn(feature, namespace string) {
-	owner := path.Join(s.ID(), feature)
-
-	eid := common.CreateTotalizer
-	header := event.NewValues()
-	header.Set("namespace", namespace)
-	header.Set("owner", owner)
-
-	rtdTotalizer := model.NewTotalizer(owner, model.TotalizeRealtime, namespace)
-	rtdEvent := event.NewEvent(eid, s.ID(), common.TotalizerModule, header, rtdTotalizer)
-	s.PostEvent(rtdEvent)
-
-	weekTotalizer := model.NewTotalizer(owner, model.TotalizeWeek, namespace)
-	weekEvent := event.NewEvent(eid, s.ID(), common.TotalizerModule, header, weekTotalizer)
-	s.PostEvent(weekEvent)
-
-	monthTotalizer := model.NewTotalizer(owner, model.TotalizeMonth, namespace)
-	monthEvent := event.NewEvent(eid, s.ID(), common.TotalizerModule, header, monthTotalizer)
-	s.PostEvent(monthEvent)
-}
-
-func (s *Base) CheckOut(feature, namespace string) {
-	owner := path.Join(s.ID(), feature)
-
-	eid := common.DeleteTotalizer
-	header := event.NewValues()
-	header.Set("namespace", namespace)
-	header.Set("owner", owner)
-
-	rtdTotalizer := model.NewTotalizer(owner, model.TotalizeRealtime, namespace)
-	rtdEvent := event.NewEvent(eid, s.ID(), common.TotalizerModule, header, rtdTotalizer)
-	s.PostEvent(rtdEvent)
-
-	weekTotalizer := model.NewTotalizer(owner, model.TotalizeWeek, namespace)
-	weekEvent := event.NewEvent(eid, s.ID(), common.TotalizerModule, header, weekTotalizer)
-	s.PostEvent(weekEvent)
-
-	monthTotalizer := model.NewTotalizer(owner, model.TotalizeMonth, namespace)
-	monthEvent := event.NewEvent(eid, s.ID(), common.TotalizerModule, header, monthTotalizer)
-	s.PostEvent(monthEvent)
-}
-
 func (s *Base) QuerySummary(feature, namespace string) (ret []*model.Totalizer) {
-	owner := path.Join(s.ID(), feature)
-
 	eid := common.QueryTotalizer
 	header := event.NewValues()
 	header.Set("namespace", namespace)
-	header.Set("owner", owner)
 
 	filter := bc.NewFilter()
-	filter.Equal("Owner", owner)
+	filter.Equal("Owner", feature)
 	filter.Equal("Catalog", model.TotalizeCurrent)
 
 	eventPtr := event.NewEvent(eid, s.ID(), common.TotalizerModule, header, filter)
