@@ -6,10 +6,12 @@ import (
 	"net"
 	"net/http"
 	"strings"
+	"time"
 
 	log "github.com/cihub/seelog"
 
 	"github.com/muidea/magicCommon/event"
+	fn "github.com/muidea/magicCommon/foundation/net"
 	fu "github.com/muidea/magicCommon/foundation/util"
 	"github.com/muidea/magicCommon/module"
 	"github.com/muidea/magicCommon/session"
@@ -54,11 +56,37 @@ func (s *loadNamespaceTask) Run() {
 		return
 	}
 
-	eid = common.InitializeAuthorityNamespace
+	header.Set("action", common.Create)
 	for _, val := range namespaceList {
+		if val.Name == config.SuperNamespace() {
+			continue
+		}
+
+		eid = fn.FormatID(common.NotifyAuthorityNamespace, val.ID)
 		eventPtr = event.NewEvent(eid, "/", "/#", header, val)
 		s.eventHub.Post(eventPtr)
 	}
+}
+
+type timerCheckTask struct {
+	eventHub event.Hub
+
+	preTime time.Time
+}
+
+func (s *timerCheckTask) Run() {
+	log.Info("timer check task running!")
+
+	eid := common.NotifyTimer
+	header := event.NewValues()
+	header.Set("namespace", config.SuperNamespace())
+
+	curTime := time.Now()
+	timerNotify := &common.TimerNotify{PreTime: s.preTime, CurTime: curTime}
+	eventPtr := event.NewEvent(eid, "/", "/#", header, timerNotify)
+	s.eventHub.Post(eventPtr)
+
+	s.preTime = curTime
 }
 
 // New 新建Core
@@ -107,6 +135,12 @@ func (s *Core) Startup(
 
 		module.Setup(val, s.endpointName, eventHub, backgroundRoutine)
 	}
+
+	loadTask := &loadNamespaceTask{eventHub: eventHub}
+	backgroundRoutine.Post(loadTask)
+
+	checkTask := &timerCheckTask{eventHub: eventHub, preTime: time.Now()}
+	backgroundRoutine.Timer(checkTask, time.Hour*24, time.Hour*2)
 }
 
 func (s *Core) Run() {
