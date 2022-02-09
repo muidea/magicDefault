@@ -6,13 +6,13 @@ import (
 	"github.com/muidea/magicCommon/task"
 	"github.com/muidea/magicDefault/common"
 	"github.com/muidea/magicDefault/core/base/biz"
-	"github.com/muidea/magicDefault/core/module/remoteHub/dao"
+	"github.com/muidea/magicDefault/core/module/remotehub/dao"
 )
 
 type RemoteHub struct {
 	biz.Base
 
-	remoteHubDao dao.RemoteHub
+	remotehubDao dao.RemoteHub
 
 	endpointName string
 }
@@ -25,7 +25,7 @@ func New(
 
 	ptr := &RemoteHub{
 		Base:         biz.New(common.RemoteHubModule, eventHub, backgroundRoutine),
-		remoteHubDao: dao.New(batisClient),
+		remotehubDao: dao.New(batisClient),
 		endpointName: endpointName,
 	}
 

@@ -6,9 +6,9 @@ type RemoteHub interface {
 }
 
 func New(clnt client.Client) RemoteHub {
-	return &remoteHub{batisClient: clnt}
+	return &remotehub{batisClient: clnt}
 }
 
-type remoteHub struct {
+type remotehub struct {
 	batisClient client.Client
 }

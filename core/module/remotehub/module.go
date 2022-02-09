@@ -1,4 +1,4 @@
-package remoteHub
+package remotehub
 
 import (
 	"github.com/muidea/magicBatis/client"
@@ -9,8 +9,8 @@ import (
 	"github.com/muidea/magicCas/toolkit"
 
 	"github.com/muidea/magicDefault/common"
-	"github.com/muidea/magicDefault/core/module/remoteHub/biz"
-	"github.com/muidea/magicDefault/core/module/remoteHub/service"
+	"github.com/muidea/magicDefault/core/module/remotehub/biz"
+	"github.com/muidea/magicDefault/core/module/remotehub/service"
 )
 
 func init() {
