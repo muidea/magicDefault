@@ -55,6 +55,9 @@ type ArticleView struct {
 }
 
 func (s *ArticleView) FromArticle(ptr *model.Article, entityPtr *cc.EntityView) {
+	if ptr == nil {
+		return
+	}
 	s.ID = ptr.ID
 	s.Title = ptr.Title
 	s.Content = ptr.Content
@@ -75,6 +78,9 @@ type ArticleLite struct {
 }
 
 func (s *ArticleLite) FromArticle(ptr *model.Article) {
+	if ptr == nil {
+		return
+	}
 	s.ID = ptr.ID
 	s.Title = ptr.Title
 	s.Content = ptr.Content
@@ -82,6 +88,9 @@ func (s *ArticleLite) FromArticle(ptr *model.Article) {
 }
 
 func (s *ArticleLite) FromView(ptr *ArticleView) {
+	if ptr == nil {
+		return
+	}
 	s.ID = ptr.ID
 	s.Title = ptr.Title
 	s.Content = ptr.Content
@@ -161,6 +170,9 @@ type CatalogView struct {
 }
 
 func (s *CatalogView) FromCatalog(ptr *model.Catalog, entityPtr *cc.EntityView) {
+	if ptr == nil {
+		return
+	}
 	s.ID = ptr.ID
 	s.Name = ptr.Name
 	s.Description = ptr.Description
@@ -178,6 +190,9 @@ type CatalogLite struct {
 }
 
 func (s *CatalogLite) FromCatalog(ptr *model.Catalog) {
+	if ptr == nil {
+		return
+	}
 	s.ID = ptr.ID
 	s.Name = ptr.Name
 	s.Description = ptr.Description
@@ -185,6 +200,9 @@ func (s *CatalogLite) FromCatalog(ptr *model.Catalog) {
 }
 
 func (s *CatalogLite) FromView(ptr *CatalogView) {
+	if ptr == nil {
+		return
+	}
 	s.ID = ptr.ID
 	s.Name = ptr.Name
 	s.Description = ptr.Description
@@ -263,6 +281,9 @@ type CommentView struct {
 }
 
 func (s *CommentView) FromComment(ptr *model.Comment, entityPtr *cc.EntityView) {
+	if ptr == nil {
+		return
+	}
 	s.ID = ptr.ID
 	s.Content = ptr.Content
 	s.Flag = ptr.Flag
@@ -278,6 +299,9 @@ type CommentLite struct {
 }
 
 func (s *CommentLite) FromComment(ptr *model.Comment) {
+	if ptr == nil {
+		return
+	}
 	s.ID = ptr.ID
 	s.Content = ptr.Content
 	s.Flag = ptr.Flag
@@ -285,6 +309,9 @@ func (s *CommentLite) FromComment(ptr *model.Comment) {
 }
 
 func (s *CommentLite) FromView(ptr *CommentView) {
+	if ptr == nil {
+		return
+	}
 	s.ID = ptr.ID
 	s.Content = ptr.Content
 	s.Flag = ptr.Flag
@@ -362,6 +389,9 @@ type LinkView struct {
 }
 
 func (s *LinkView) FromLink(ptr *model.Link, entityPtr *cc.EntityView) {
+	if ptr == nil {
+		return
+	}
 	s.ID = ptr.ID
 	s.Name = ptr.Name
 	s.Description = ptr.Description
@@ -384,6 +414,9 @@ type LinkLite struct {
 }
 
 func (s *LinkLite) FromLink(ptr *model.Link) {
+	if ptr == nil {
+		return
+	}
 	s.ID = ptr.ID
 	s.Name = ptr.Name
 	s.Description = ptr.Description
@@ -391,6 +424,9 @@ func (s *LinkLite) FromLink(ptr *model.Link) {
 }
 
 func (s *LinkLite) FromView(ptr *LinkView) {
+	if ptr == nil {
+		return
+	}
 	s.ID = ptr.ID
 	s.Name = ptr.Name
 	s.Description = ptr.Description
@@ -481,6 +517,9 @@ type MediaView struct {
 }
 
 func (s *MediaView) FromMedia(ptr *model.Media, entityPtr *cc.EntityView) {
+	if ptr == nil {
+		return
+	}
 	s.ID = ptr.ID
 	s.Name = ptr.Name
 	s.Description = ptr.Description
@@ -504,6 +543,9 @@ type MediaLite struct {
 }
 
 func (s *MediaLite) FromMedia(ptr *model.Media) {
+	if ptr == nil {
+		return
+	}
 	s.ID = ptr.ID
 	s.Name = ptr.Name
 	s.Description = ptr.Description
@@ -511,6 +553,9 @@ func (s *MediaLite) FromMedia(ptr *model.Media) {
 }
 
 func (s *MediaLite) FromView(ptr *MediaView) {
+	if ptr == nil {
+		return
+	}
 	s.ID = ptr.ID
 	s.Name = ptr.Name
 	s.Description = ptr.Description
