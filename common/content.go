@@ -176,8 +176,10 @@ func (s *CatalogView) FromCatalog(ptr *model.Catalog, entityPtr *cc.EntityView) 
 	s.ID = ptr.ID
 	s.Name = ptr.Name
 	s.Description = ptr.Description
-	s.Catalog = &CatalogLite{}
-	s.Catalog.FromCatalog(ptr.Catalog)
+	if ptr.Catalog != nil {
+		s.Catalog = &CatalogLite{}
+		s.Catalog.FromCatalog(ptr.Catalog)
+	}
 	s.Creater = entityPtr
 	s.UpdateTime = ptr.UpdateTime
 	return
