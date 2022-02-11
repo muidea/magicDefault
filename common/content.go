@@ -113,7 +113,6 @@ func (s *ArticleLite) ToArticle() (ret *model.Article) {
 }
 
 type ArticleParam struct {
-	ID      int            `json:"id"`
 	Title   string         `json:"title"`
 	Content string         `json:"content"`
 	Catalog []*CatalogLite `json:"catalog"`
@@ -227,7 +226,6 @@ func (s *CatalogLite) ToCatalog() (ret *model.Catalog) {
 }
 
 type CatalogParam struct {
-	ID          int          `json:"id"`
 	Name        string       `json:"name"`
 	Description string       `json:"description"`
 	Catalog     *CatalogLite `json:"catalog"`
@@ -336,7 +334,6 @@ func (s *CommentLite) ToComment() (ret *model.Comment) {
 }
 
 type CommentParam struct {
-	ID      int    `json:"id"`
 	Content string `json:"content"`
 	Flag    int    `json:"flag"`
 }
@@ -451,7 +448,6 @@ func (s *LinkLite) ToLink() (ret *model.Link) {
 }
 
 type LinkParam struct {
-	ID          int            `json:"id"`
 	Name        string         `json:"name"`
 	Description string         `json:"description"`
 	URL         string         `json:"url"`
@@ -580,7 +576,6 @@ func (s *MediaLite) ToMedia() (ret *model.Media) {
 }
 
 type MediaParam struct {
-	ID          int            `json:"id"`
 	Name        string         `json:"name"`
 	Description string         `json:"description"`
 	FileToken   string         `json:"fileToken"`
