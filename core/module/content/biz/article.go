@@ -42,6 +42,7 @@ func (s *Content) CreateArticle(ptr *common.ArticleParam, creater int, namespace
 func (s *Content) UpdateArticle(id int, ptr *common.ArticleParam, updater int, namespace string) (ret *model.Article, err error) {
 	currentArticle, currentErr := s.contentDao.QueryArticle(id, namespace)
 	if currentErr != nil {
+		err = currentErr
 		return
 	}
 

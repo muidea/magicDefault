@@ -98,7 +98,7 @@ func (s *ArticleLite) FromView(ptr *ArticleView) {
 }
 
 func (s *ArticleLite) ToArticle() (ret *model.Article) {
-	ptr := &model.Article{Catalog: []*model.Catalog{}}
+	ptr := &model.Article{}
 	if s.ID != 0 {
 		ptr.ID = s.ID
 	}
@@ -120,7 +120,7 @@ type ArticleParam struct {
 
 func (s *ArticleParam) ToArticle(ptr *model.Article) (ret *model.Article) {
 	if ptr == nil {
-		ptr = &model.Article{Catalog: []*model.Catalog{}}
+		ptr = &model.Article{}
 	}
 
 	if s.Title != "" {
@@ -129,8 +129,11 @@ func (s *ArticleParam) ToArticle(ptr *model.Article) (ret *model.Article) {
 	if s.Content != "" {
 		ptr.Content = s.Content
 	}
-	for _, val := range s.Catalog {
-		ptr.Catalog = append(ptr.Catalog, val.ToCatalog())
+	if len(s.Catalog) > 0 {
+		ptr.Catalog = []*model.Catalog{}
+		for _, val := range s.Catalog {
+			ptr.Catalog = append(ptr.Catalog, val.ToCatalog())
+		}
 	}
 
 	ret = ptr
@@ -211,7 +214,7 @@ func (s *CatalogLite) FromView(ptr *CatalogView) {
 }
 
 func (s *CatalogLite) ToCatalog() (ret *model.Catalog) {
-	ptr := &model.Catalog{Catalog: &model.Catalog{}}
+	ptr := &model.Catalog{}
 	if s.ID != 0 {
 		ptr.ID = s.ID
 	}
@@ -233,7 +236,7 @@ type CatalogParam struct {
 
 func (s *CatalogParam) ToCatalog(ptr *model.Catalog) (ret *model.Catalog) {
 	if ptr == nil {
-		ptr = &model.Catalog{Catalog: &model.Catalog{}}
+		ptr = &model.Catalog{}
 	}
 
 	if s.Name != "" {
@@ -433,7 +436,7 @@ func (s *LinkLite) FromView(ptr *LinkView) {
 }
 
 func (s *LinkLite) ToLink() (ret *model.Link) {
-	ptr := &model.Link{Catalog: []*model.Catalog{}}
+	ptr := &model.Link{}
 	if s.ID != 0 {
 		ptr.ID = s.ID
 	}
@@ -457,7 +460,7 @@ type LinkParam struct {
 
 func (s *LinkParam) ToLink(ptr *model.Link) (ret *model.Link) {
 	if ptr == nil {
-		ptr = &model.Link{Catalog: []*model.Catalog{}}
+		ptr = &model.Link{}
 	}
 
 	if s.Name != "" {
@@ -472,8 +475,11 @@ func (s *LinkParam) ToLink(ptr *model.Link) (ret *model.Link) {
 	if s.Logo != "" {
 		ptr.Logo = s.Logo
 	}
-	for _, val := range s.Catalog {
-		ptr.Catalog = append(ptr.Catalog, val.ToCatalog())
+	if len(s.Catalog) > 0 {
+		ptr.Catalog = []*model.Catalog{}
+		for _, val := range s.Catalog {
+			ptr.Catalog = append(ptr.Catalog, val.ToCatalog())
+		}
 	}
 
 	ret = ptr
@@ -561,7 +567,7 @@ func (s *MediaLite) FromView(ptr *MediaView) {
 }
 
 func (s *MediaLite) ToMedia() (ret *model.Media) {
-	ptr := &model.Media{Catalog: []*model.Catalog{}}
+	ptr := &model.Media{}
 	if s.ID != 0 {
 		ptr.ID = s.ID
 	}
@@ -586,7 +592,7 @@ type MediaParam struct {
 
 func (s *MediaParam) ToMedia(ptr *model.Media) (ret *model.Media) {
 	if ptr == nil {
-		ptr = &model.Media{Catalog: []*model.Catalog{}}
+		ptr = &model.Media{}
 	}
 
 	if s.Name != "" {
@@ -604,8 +610,11 @@ func (s *MediaParam) ToMedia(ptr *model.Media) (ret *model.Media) {
 	if len(s.Tags) > 0 {
 		ptr.Tags = s.Tags
 	}
-	for _, val := range s.Catalog {
-		ptr.Catalog = append(ptr.Catalog, val.ToCatalog())
+	if len(s.Catalog) > 0 {
+		ptr.Catalog = []*model.Catalog{}
+		for _, val := range s.Catalog {
+			ptr.Catalog = append(ptr.Catalog, val.ToCatalog())
+		}
 	}
 
 	ret = ptr

@@ -89,7 +89,6 @@ func (s *Content) FilterLink(ctx context.Context, res http.ResponseWriter, req *
 	} else {
 		queryFilter.Page(fu.NewPagination(20, 1))
 	}
-	queryFilter.Sort(fu.NewSortFilter("UpdateTime", false))
 
 	modelVal, modelOK := filter.Get("mode")
 	if modelOK {

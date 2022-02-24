@@ -42,6 +42,7 @@ func (s *Content) CreateCatalog(ptr *common.CatalogParam, creater int, namespace
 func (s *Content) UpdateCatalog(id int, ptr *common.CatalogParam, updater int, namespace string) (ret *model.Catalog, err error) {
 	currentCatalog, currentErr := s.contentDao.QueryCatalog(id, namespace)
 	if currentErr != nil {
+		err = currentErr
 		return
 	}
 

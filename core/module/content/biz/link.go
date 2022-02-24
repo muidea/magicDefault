@@ -42,6 +42,7 @@ func (s *Content) CreateLink(ptr *common.LinkParam, creater int, namespace strin
 func (s *Content) UpdateLink(id int, ptr *common.LinkParam, updater int, namespace string) (ret *model.Link, err error) {
 	currentLink, currentErr := s.contentDao.QueryLink(id, namespace)
 	if currentErr != nil {
+		err = currentErr
 		return
 	}
 

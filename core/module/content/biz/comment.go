@@ -42,6 +42,7 @@ func (s *Content) CreateComment(ptr *common.CommentParam, creater int, namespace
 func (s *Content) UpdateComment(id int, ptr *common.CommentParam, updater int, namespace string) (ret *model.Comment, err error) {
 	currentComment, currentErr := s.contentDao.QueryComment(id, namespace)
 	if currentErr != nil {
+		err = currentErr
 		return
 	}
 

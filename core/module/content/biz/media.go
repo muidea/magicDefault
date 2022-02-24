@@ -42,6 +42,7 @@ func (s *Content) CreateMedia(ptr *common.MediaParam, creater int, namespace str
 func (s *Content) UpdateMedia(id int, ptr *common.MediaParam, updater int, namespace string) (ret *model.Media, err error) {
 	currentMedia, currentErr := s.contentDao.QueryMedia(id, namespace)
 	if currentErr != nil {
+		err = currentErr
 		return
 	}
 
