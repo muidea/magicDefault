@@ -1,11 +1,12 @@
 package biz
 
 import (
-	fn "github.com/muidea/magicCommon/foundation/net"
 	"time"
 
 	log "github.com/cihub/seelog"
+
 	bc "github.com/muidea/magicBatis/common"
+	fn "github.com/muidea/magicCommon/foundation/net"
 
 	"github.com/muidea/magicDefault/common"
 	"github.com/muidea/magicDefault/model"

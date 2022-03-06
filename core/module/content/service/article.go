@@ -12,7 +12,6 @@ import (
 	fn "github.com/muidea/magicCommon/foundation/net"
 	fu "github.com/muidea/magicCommon/foundation/util"
 	"github.com/muidea/magicCommon/session"
-
 	"github.com/muidea/magicDefault/common"
 )
 

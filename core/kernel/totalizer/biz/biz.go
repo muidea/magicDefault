@@ -2,6 +2,7 @@ package biz
 
 import (
 	log "github.com/cihub/seelog"
+
 	"github.com/muidea/magicBatis/client"
 	bc "github.com/muidea/magicBatis/common"
 
