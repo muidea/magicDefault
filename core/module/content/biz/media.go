@@ -25,7 +25,7 @@ func (s *Content) QueryMedia(id int, namespace string) (ret *model.Media, err er
 func (s *Content) CreateMedia(ptr *common.MediaParam, creater int, namespace string) (ret *model.Media, err error) {
 	mediaPtr := ptr.ToMedia(nil)
 	mediaPtr.Creater = creater
-	mediaPtr.UpdateTime = time.Now().UTC().Unix()
+	mediaPtr.CreateTime = time.Now().UTC().Unix()
 	ret, err = s.contentDao.CreateMedia(mediaPtr, namespace)
 	if err != nil {
 		return
@@ -48,7 +48,7 @@ func (s *Content) UpdateMedia(id int, ptr *common.MediaParam, updater int, names
 
 	currentMedia = ptr.ToMedia(currentMedia)
 	currentMedia.Creater = updater
-	currentMedia.UpdateTime = time.Now().UTC().Unix()
+	currentMedia.CreateTime = time.Now().UTC().Unix()
 	ret, err = s.contentDao.UpdateMedia(currentMedia, namespace)
 	if err != nil {
 		return

@@ -51,7 +51,7 @@ type ArticleView struct {
 	Content    string         `json:"content"`
 	Catalog    []*CatalogLite `json:"catalog"`
 	Creater    *cc.EntityView `json:"creater"`
-	UpdateTime int64          `json:"updateTime"`
+	CreateTime int64          `json:"createTime"`
 }
 
 func (s *ArticleView) FromArticle(ptr *model.Article, entityPtr *cc.EntityView) {
@@ -67,7 +67,7 @@ func (s *ArticleView) FromArticle(ptr *model.Article, entityPtr *cc.EntityView) 
 		s.Catalog = append(s.Catalog, lite)
 	}
 	s.Creater = entityPtr
-	s.UpdateTime = ptr.UpdateTime
+	s.CreateTime = ptr.CreateTime
 	return
 }
 
@@ -168,7 +168,7 @@ type CatalogView struct {
 	Description string         `json:"description"`
 	Catalog     *CatalogLite   `json:"catalog"`
 	Creater     *cc.EntityView `json:"creater"`
-	UpdateTime  int64          `json:"updateTime"`
+	CreateTime  int64          `json:"createTime"`
 }
 
 func (s *CatalogView) FromCatalog(ptr *model.Catalog, entityPtr *cc.EntityView) {
@@ -183,7 +183,7 @@ func (s *CatalogView) FromCatalog(ptr *model.Catalog, entityPtr *cc.EntityView) 
 		s.Catalog.FromCatalog(ptr.Catalog)
 	}
 	s.Creater = entityPtr
-	s.UpdateTime = ptr.UpdateTime
+	s.CreateTime = ptr.CreateTime
 	return
 }
 
@@ -280,7 +280,7 @@ type CommentView struct {
 	Content    string         `json:"content"`
 	Flag       int            `json:"flag"`
 	Creater    *cc.EntityView `json:"creater"`
-	UpdateTime int64          `json:"updateTime"`
+	CreateTime int64          `json:"createTime"`
 }
 
 func (s *CommentView) FromComment(ptr *model.Comment, entityPtr *cc.EntityView) {
@@ -291,7 +291,7 @@ func (s *CommentView) FromComment(ptr *model.Comment, entityPtr *cc.EntityView) 
 	s.Content = ptr.Content
 	s.Flag = ptr.Flag
 	s.Creater = entityPtr
-	s.UpdateTime = ptr.UpdateTime
+	s.CreateTime = ptr.CreateTime
 	return
 }
 
@@ -387,7 +387,7 @@ type LinkView struct {
 	Logo        string         `json:"logo"`
 	Catalog     []*CatalogLite `json:"catalog"`
 	Creater     *cc.EntityView `json:"creater"`
-	UpdateTime  int64          `json:"updateTime"`
+	CreateTime  int64          `json:"createTime"`
 }
 
 func (s *LinkView) FromLink(ptr *model.Link, entityPtr *cc.EntityView) {
@@ -405,7 +405,7 @@ func (s *LinkView) FromLink(ptr *model.Link, entityPtr *cc.EntityView) {
 		s.Catalog = append(s.Catalog, lite)
 	}
 	s.Creater = entityPtr
-	s.UpdateTime = ptr.UpdateTime
+	s.CreateTime = ptr.CreateTime
 	return
 }
 
@@ -517,7 +517,7 @@ type MediaView struct {
 	Tags        []string       `json:"tags"`
 	Catalog     []*CatalogLite `json:"catalog"`
 	Creater     *cc.EntityView `json:"creater"`
-	UpdateTime  int64          `json:"updateTime"`
+	CreateTime  int64          `json:"createTime"`
 }
 
 func (s *MediaView) FromMedia(ptr *model.Media, entityPtr *cc.EntityView) {
@@ -536,7 +536,7 @@ func (s *MediaView) FromMedia(ptr *model.Media, entityPtr *cc.EntityView) {
 		s.Catalog = append(s.Catalog, lite)
 	}
 	s.Creater = entityPtr
-	s.UpdateTime = ptr.UpdateTime
+	s.CreateTime = ptr.CreateTime
 	return
 }
 

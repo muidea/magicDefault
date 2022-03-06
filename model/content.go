@@ -7,7 +7,7 @@ type Article struct {
 	Content    string     `json:"content" orm:"content"`
 	Catalog    []*Catalog `json:"catalog" orm:"catalog"`
 	Creater    int        `json:"creater" orm:"creater"`
-	UpdateTime int64      `json:"updateTime" orm:"updateTime"`
+	CreateTime int64      `json:"createTime" orm:"createTime"`
 	Namespace  string     `json:"namespace" orm:"namespace"`
 }
 
@@ -18,7 +18,7 @@ type Catalog struct {
 	Description string   `json:"description" orm:"description"`
 	Catalog     *Catalog `json:"catalog" orm:"catalog"`
 	Creater     int      `json:"creater" orm:"creater"`
-	UpdateTime  int64    `json:"updateTime" orm:"updateTime"`
+	CreateTime  int64    `json:"createTime" orm:"createTime"`
 	Namespace   string   `json:"namespace" orm:"namespace"`
 }
 
@@ -31,7 +31,7 @@ type Link struct {
 	Logo        string     `json:"logo" orm:"logo"`
 	Catalog     []*Catalog `json:"catalog" orm:"catalog"`
 	Creater     int        `json:"creater" orm:"creater"`
-	UpdateTime  int64      `json:"updateTime" orm:"updateTime"`
+	CreateTime  int64      `json:"createTime" orm:"createTime"`
 	Namespace   string     `json:"namespace" orm:"namespace"`
 }
 
@@ -45,7 +45,7 @@ type Media struct {
 	Tags        []string   `json:"tags" orm:"tags"`
 	Catalog     []*Catalog `json:"catalog" orm:"catalog"`
 	Creater     int        `json:"creater" orm:"creater"`
-	UpdateTime  int64      `json:"updateTime" orm:"updateTime"`
+	CreateTime  int64      `json:"createTime" orm:"createTime"`
 	Namespace   string     `json:"namespace" orm:"namespace"`
 }
 
@@ -55,6 +55,6 @@ type Comment struct {
 	Content    string `json:"content" orm:"content"`
 	Flag       int    `json:"flag" orm:"flag"`
 	Creater    int    `json:"creater" orm:"creater"`
-	UpdateTime int64  `json:"updateTime" orm:"updateTime"`
+	CreateTime int64  `json:"createTime" orm:"createTime"`
 	Namespace  string `json:"namespace" orm:"namespace"`
 }

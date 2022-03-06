@@ -105,7 +105,6 @@ func (s *Content) FilterArticle(ctx context.Context, res http.ResponseWriter, re
 		res.WriteHeader(http.StatusNotFound)
 		return
 	}
-
 	curSession := ctx.Value(session.AuthSession).(session.Session)
 	result := &common.ArticleStatisticResult{}
 	for {
@@ -126,7 +125,6 @@ func (s *Content) FilterArticle(ctx context.Context, res http.ResponseWriter, re
 
 		for _, val := range articleList {
 			view := &common.ArticleView{}
-
 			entityPtr := s.queryEntity(curSession.GetSessionInfo(), val.Creater, curNamespace)
 			view.FromArticle(val, entityPtr)
 			result.Article = append(result.Article, view)
@@ -164,8 +162,8 @@ func (s *Content) QueryArticle(ctx context.Context, res http.ResponseWriter, req
 			break
 		}
 
-		entityPtr := s.queryEntity(curSession.GetSessionInfo(), articlePtr.Creater, curNamespace)
 		result.Article = &common.ArticleView{}
+		entityPtr := s.queryEntity(curSession.GetSessionInfo(), articlePtr.Creater, curNamespace)
 		result.Article.FromArticle(articlePtr, entityPtr)
 		result.ErrorCode = cd.Success
 		break
@@ -296,8 +294,8 @@ func (s *Content) DeleteArticle(ctx context.Context, res http.ResponseWriter, re
 		memo := fmt.Sprintf("删除Article:%d", articlePtr.ID)
 		s.writeLog(ctx, res, req, memo)
 
-		entityPtr := s.queryEntity(curSession.GetSessionInfo(), articlePtr.Creater, curNamespace)
 		result.Article = &common.ArticleView{}
+		entityPtr := s.queryEntity(curSession.GetSessionInfo(), articlePtr.Creater, curNamespace)
 		result.Article.FromArticle(articlePtr, entityPtr)
 		result.ErrorCode = cd.Success
 		break

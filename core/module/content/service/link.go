@@ -105,7 +105,6 @@ func (s *Content) FilterLink(ctx context.Context, res http.ResponseWriter, req *
 		res.WriteHeader(http.StatusNotFound)
 		return
 	}
-
 	curSession := ctx.Value(session.AuthSession).(session.Session)
 	result := &common.LinkStatisticResult{}
 	for {
@@ -126,7 +125,6 @@ func (s *Content) FilterLink(ctx context.Context, res http.ResponseWriter, req *
 
 		for _, val := range linkList {
 			view := &common.LinkView{}
-
 			entityPtr := s.queryEntity(curSession.GetSessionInfo(), val.Creater, curNamespace)
 			view.FromLink(val, entityPtr)
 			result.Link = append(result.Link, view)
@@ -164,8 +162,8 @@ func (s *Content) QueryLink(ctx context.Context, res http.ResponseWriter, req *h
 			break
 		}
 
-		entityPtr := s.queryEntity(curSession.GetSessionInfo(), linkPtr.Creater, curNamespace)
 		result.Link = &common.LinkView{}
+		entityPtr := s.queryEntity(curSession.GetSessionInfo(), linkPtr.Creater, curNamespace)
 		result.Link.FromLink(linkPtr, entityPtr)
 		result.ErrorCode = cd.Success
 		break
@@ -296,8 +294,8 @@ func (s *Content) DeleteLink(ctx context.Context, res http.ResponseWriter, req *
 		memo := fmt.Sprintf("删除Link:%d", linkPtr.ID)
 		s.writeLog(ctx, res, req, memo)
 
-		entityPtr := s.queryEntity(curSession.GetSessionInfo(), linkPtr.Creater, curNamespace)
 		result.Link = &common.LinkView{}
+		entityPtr := s.queryEntity(curSession.GetSessionInfo(), linkPtr.Creater, curNamespace)
 		result.Link.FromLink(linkPtr, entityPtr)
 		result.ErrorCode = cd.Success
 		break

@@ -105,7 +105,6 @@ func (s *Content) FilterComment(ctx context.Context, res http.ResponseWriter, re
 		res.WriteHeader(http.StatusNotFound)
 		return
 	}
-
 	curSession := ctx.Value(session.AuthSession).(session.Session)
 	result := &common.CommentStatisticResult{}
 	for {
@@ -126,7 +125,6 @@ func (s *Content) FilterComment(ctx context.Context, res http.ResponseWriter, re
 
 		for _, val := range commentList {
 			view := &common.CommentView{}
-
 			entityPtr := s.queryEntity(curSession.GetSessionInfo(), val.Creater, curNamespace)
 			view.FromComment(val, entityPtr)
 			result.Comment = append(result.Comment, view)
@@ -164,8 +162,8 @@ func (s *Content) QueryComment(ctx context.Context, res http.ResponseWriter, req
 			break
 		}
 
-		entityPtr := s.queryEntity(curSession.GetSessionInfo(), commentPtr.Creater, curNamespace)
 		result.Comment = &common.CommentView{}
+		entityPtr := s.queryEntity(curSession.GetSessionInfo(), commentPtr.Creater, curNamespace)
 		result.Comment.FromComment(commentPtr, entityPtr)
 		result.ErrorCode = cd.Success
 		break
@@ -296,8 +294,8 @@ func (s *Content) DeleteComment(ctx context.Context, res http.ResponseWriter, re
 		memo := fmt.Sprintf("删除Comment:%d", commentPtr.ID)
 		s.writeLog(ctx, res, req, memo)
 
-		entityPtr := s.queryEntity(curSession.GetSessionInfo(), commentPtr.Creater, curNamespace)
 		result.Comment = &common.CommentView{}
+		entityPtr := s.queryEntity(curSession.GetSessionInfo(), commentPtr.Creater, curNamespace)
 		result.Comment.FromComment(commentPtr, entityPtr)
 		result.ErrorCode = cd.Success
 		break

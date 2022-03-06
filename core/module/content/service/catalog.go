@@ -105,7 +105,6 @@ func (s *Content) FilterCatalog(ctx context.Context, res http.ResponseWriter, re
 		res.WriteHeader(http.StatusNotFound)
 		return
 	}
-
 	curSession := ctx.Value(session.AuthSession).(session.Session)
 	result := &common.CatalogStatisticResult{}
 	for {
@@ -126,7 +125,6 @@ func (s *Content) FilterCatalog(ctx context.Context, res http.ResponseWriter, re
 
 		for _, val := range catalogList {
 			view := &common.CatalogView{}
-
 			entityPtr := s.queryEntity(curSession.GetSessionInfo(), val.Creater, curNamespace)
 			view.FromCatalog(val, entityPtr)
 			result.Catalog = append(result.Catalog, view)
@@ -164,8 +162,8 @@ func (s *Content) QueryCatalog(ctx context.Context, res http.ResponseWriter, req
 			break
 		}
 
-		entityPtr := s.queryEntity(curSession.GetSessionInfo(), catalogPtr.Creater, curNamespace)
 		result.Catalog = &common.CatalogView{}
+		entityPtr := s.queryEntity(curSession.GetSessionInfo(), catalogPtr.Creater, curNamespace)
 		result.Catalog.FromCatalog(catalogPtr, entityPtr)
 		result.ErrorCode = cd.Success
 		break
@@ -296,8 +294,8 @@ func (s *Content) DeleteCatalog(ctx context.Context, res http.ResponseWriter, re
 		memo := fmt.Sprintf("删除Catalog:%d", catalogPtr.ID)
 		s.writeLog(ctx, res, req, memo)
 
-		entityPtr := s.queryEntity(curSession.GetSessionInfo(), catalogPtr.Creater, curNamespace)
 		result.Catalog = &common.CatalogView{}
+		entityPtr := s.queryEntity(curSession.GetSessionInfo(), catalogPtr.Creater, curNamespace)
 		result.Catalog.FromCatalog(catalogPtr, entityPtr)
 		result.ErrorCode = cd.Success
 		break

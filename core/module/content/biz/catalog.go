@@ -25,7 +25,7 @@ func (s *Content) QueryCatalog(id int, namespace string) (ret *model.Catalog, er
 func (s *Content) CreateCatalog(ptr *common.CatalogParam, creater int, namespace string) (ret *model.Catalog, err error) {
 	catalogPtr := ptr.ToCatalog(nil)
 	catalogPtr.Creater = creater
-	catalogPtr.UpdateTime = time.Now().UTC().Unix()
+	catalogPtr.CreateTime = time.Now().UTC().Unix()
 	ret, err = s.contentDao.CreateCatalog(catalogPtr, namespace)
 	if err != nil {
 		return
@@ -48,7 +48,7 @@ func (s *Content) UpdateCatalog(id int, ptr *common.CatalogParam, updater int, n
 
 	currentCatalog = ptr.ToCatalog(currentCatalog)
 	currentCatalog.Creater = updater
-	currentCatalog.UpdateTime = time.Now().UTC().Unix()
+	currentCatalog.CreateTime = time.Now().UTC().Unix()
 	ret, err = s.contentDao.UpdateCatalog(currentCatalog, namespace)
 	if err != nil {
 		return

@@ -105,7 +105,6 @@ func (s *Content) FilterMedia(ctx context.Context, res http.ResponseWriter, req 
 		res.WriteHeader(http.StatusNotFound)
 		return
 	}
-
 	curSession := ctx.Value(session.AuthSession).(session.Session)
 	result := &common.MediaStatisticResult{}
 	for {
@@ -126,7 +125,6 @@ func (s *Content) FilterMedia(ctx context.Context, res http.ResponseWriter, req 
 
 		for _, val := range mediaList {
 			view := &common.MediaView{}
-
 			entityPtr := s.queryEntity(curSession.GetSessionInfo(), val.Creater, curNamespace)
 			view.FromMedia(val, entityPtr)
 			result.Media = append(result.Media, view)
@@ -164,8 +162,8 @@ func (s *Content) QueryMedia(ctx context.Context, res http.ResponseWriter, req *
 			break
 		}
 
-		entityPtr := s.queryEntity(curSession.GetSessionInfo(), mediaPtr.Creater, curNamespace)
 		result.Media = &common.MediaView{}
+		entityPtr := s.queryEntity(curSession.GetSessionInfo(), mediaPtr.Creater, curNamespace)
 		result.Media.FromMedia(mediaPtr, entityPtr)
 		result.ErrorCode = cd.Success
 		break
@@ -296,8 +294,8 @@ func (s *Content) DeleteMedia(ctx context.Context, res http.ResponseWriter, req 
 		memo := fmt.Sprintf("删除Media:%d", mediaPtr.ID)
 		s.writeLog(ctx, res, req, memo)
 
-		entityPtr := s.queryEntity(curSession.GetSessionInfo(), mediaPtr.Creater, curNamespace)
 		result.Media = &common.MediaView{}
+		entityPtr := s.queryEntity(curSession.GetSessionInfo(), mediaPtr.Creater, curNamespace)
 		result.Media.FromMedia(mediaPtr, entityPtr)
 		result.ErrorCode = cd.Success
 		break
