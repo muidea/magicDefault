@@ -9,6 +9,7 @@ import (
 	"github.com/muidea/magicBatis/client"
 	bc "github.com/muidea/magicBatis/common"
 	"github.com/muidea/magicDefault/config"
+	"github.com/muidea/magicDefault/model"
 )
 
 var batisInitializeOnce sync.Once
@@ -29,6 +30,12 @@ func Initialize(endpointName string) (err error) {
 		err = clnt.RegisterService(servicePtr)
 		if err != nil {
 			log.Errorf("register instance failed, err:%s", err.Error())
+			return
+		}
+
+		err = model.InitializeModel(clnt)
+		if err != nil {
+			log.Errorf("initialize model failed, err:%s", err.Error())
 			return
 		}
 

@@ -9,8 +9,8 @@ import (
 	"github.com/muidea/magicCas/toolkit"
 
 	"github.com/muidea/magicDefault/common"
-	"github.com/muidea/magicDefault/core/module/remotehub/biz"
-	"github.com/muidea/magicDefault/core/module/remotehub/service"
+	"github.com/muidea/magicDefault/core/kernel/remotehub/biz"
+	"github.com/muidea/magicDefault/core/kernel/remotehub/service"
 )
 
 func init() {

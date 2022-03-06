@@ -2,13 +2,5 @@
 	"apiVersion": "",
 	"projectName": "magicDefault",
 	"projectType": "default",
-	"module": [
-		{
-			"apiVersion": "",
-			"name": "RemoteHub",
-			"desc": "",
-			"icon": "",
-			"model": null
-		}
-	]
+	"module": []
 }
