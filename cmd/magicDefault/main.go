@@ -10,6 +10,7 @@ import (
 
 	"github.com/muidea/magicCommon/application"
 
+	"github.com/muidea/magicDefault/config"
 	"github.com/muidea/magicDefault/core"
 )
 
@@ -39,6 +40,7 @@ func main() {
 
 	fmt.Printf("magicDefault V1.0\n")
 
+	config.UpdateLocalInfo(endpointName, listenPort)
 	core, err := core.New(endpointName, listenPort)
 	if err != nil {
 		log.Errorf("create core service failed, err:%s", err.Error())
