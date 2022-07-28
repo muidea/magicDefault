@@ -22,32 +22,32 @@ type RoleVerifier interface {
 type RoleRegistry interface {
 	SetApiVersion(version string)
 
-	AddHandler(pattern, method string, privateValue int, handler func(context.Context, http.ResponseWriter, *http.Request))
+	AddHandler(pattern, method string, privilegeValue int, handler func(context.Context, http.ResponseWriter, *http.Request))
 
-	AddRoute(route engine.Route, privateValue int, filters ...engine.MiddleWareHandler)
+	AddRoute(route engine.Route, privilegeValue int, filters ...engine.MiddleWareHandler)
 
-	GetAllPrivateItem() []*common.PrivateItem
+	GetAllPrivilege() []*common.Privilege
 }
 
 // NewRoleRegistry create routeRegistry
 func NewRoleRegistry(verifier RoleVerifier, router engine.Router) (ret RoleRegistry) {
-	ret = &roleRegistryImpl{roleVerifier: verifier, router: router, privateItemSlice: privateItemSlice{}}
+	ret = &roleRegistryImpl{roleVerifier: verifier, router: router, privilegeItemSlice: privilegeItemSlice{}}
 	return
 }
 
-type privateItem struct {
-	patternFilter *engine.PatternFilter
-	privateValue  int
-	patternPath   string
+type privilegeItem struct {
+	patternFilter  *engine.PatternFilter
+	privilegeValue int
+	patternPath    string
 }
 
-type privateItemSlice []*privateItem
+type privilegeItemSlice []*privilegeItem
 
 // roleRegistryImpl cas route registry
 type roleRegistryImpl struct {
-	roleVerifier     RoleVerifier
-	router           engine.Router
-	privateItemSlice privateItemSlice
+	roleVerifier       RoleVerifier
+	router             engine.Router
+	privilegeItemSlice privilegeItemSlice
 }
 
 func (s *roleRegistryImpl) SetApiVersion(version string) {
@@ -57,7 +57,7 @@ func (s *roleRegistryImpl) SetApiVersion(version string) {
 // AddHandler add route handler
 func (s *roleRegistryImpl) AddHandler(
 	pattern, method string,
-	privateValue int,
+	privilegeValue int,
 	handler func(context.Context, http.ResponseWriter, *http.Request)) {
 
 	rtPattern := pattern
@@ -66,33 +66,33 @@ func (s *roleRegistryImpl) AddHandler(
 		rtPattern = fmt.Sprintf("%s%s", apiVersion, rtPattern)
 	}
 
-	privateItem := &privateItem{
-		patternFilter: engine.NewPatternFilter(rtPattern),
-		privateValue:  privateValue,
-		patternPath:   rtPattern,
+	privilegeItem := &privilegeItem{
+		patternFilter:  engine.NewPatternFilter(rtPattern),
+		privilegeValue: privilegeValue,
+		patternPath:    rtPattern,
 	}
 
-	s.privateItemSlice = append(s.privateItemSlice, privateItem)
+	s.privilegeItemSlice = append(s.privilegeItemSlice, privilegeItem)
 
 	s.router.AddRoute(engine.CreateRoute(pattern, method, handler), s)
 }
 
-func (s *roleRegistryImpl) AddRoute(route engine.Route, privateValue int, filters ...engine.MiddleWareHandler) {
-	privateItem := &privateItem{
-		patternFilter: engine.NewPatternFilter(route.Pattern()),
-		privateValue:  privateValue,
-		patternPath:   route.Pattern(),
+func (s *roleRegistryImpl) AddRoute(route engine.Route, privilegeValue int, filters ...engine.MiddleWareHandler) {
+	privilegeItem := &privilegeItem{
+		patternFilter:  engine.NewPatternFilter(route.Pattern()),
+		privilegeValue: privilegeValue,
+		patternPath:    route.Pattern(),
 	}
 
-	s.privateItemSlice = append(s.privateItemSlice, privateItem)
+	s.privilegeItemSlice = append(s.privilegeItemSlice, privilegeItem)
 
 	filters = append(filters, s)
 	s.router.AddRoute(route, filters...)
 }
 
-func (s *roleRegistryImpl) GetAllPrivateItem() (ret []*common.PrivateItem) {
-	for _, val := range s.privateItemSlice {
-		item := &common.PrivateItem{Path: val.patternPath, Value: common.GetPrivateInfo(val.privateValue)}
+func (s *roleRegistryImpl) GetAllPrivilege() (ret []*common.Privilege) {
+	for _, val := range s.privilegeItemSlice {
+		item := &common.Privilege{Path: val.patternPath, Value: common.GetPermission(val.privilegeValue)}
 
 		ret = append(ret, item)
 	}
@@ -120,17 +120,17 @@ func (s *roleRegistryImpl) Handle(ctx engine.RequestContext, res http.ResponseWr
 			break
 		}
 
-		privatePattern := ""
-		privateValue := 0
-		for _, val := range s.privateItemSlice {
+		patternPath := ""
+		privilegeValue := 0
+		for _, val := range s.privilegeItemSlice {
 			if val.patternFilter.Match(req.URL.Path) {
-				privatePattern = val.patternPath
-				privateValue = val.privateValue
+				patternPath = val.patternPath
+				privilegeValue = val.privilegeValue
 				break
 			}
 		}
 
-		err := s.verifyRole(casRole, privatePattern, privateValue)
+		err := s.verifyRole(casRole, patternPath, privilegeValue)
 		if err != nil {
 			result.ErrorCode = def.InvalidAuthority
 			result.Reason = err.Error()
@@ -156,41 +156,41 @@ func (s *roleRegistryImpl) Handle(ctx engine.RequestContext, res http.ResponseWr
 	ctx.Next()
 }
 
-func (s *roleRegistryImpl) verifyRole(privateRole *common.RoleView, privatePath string, privateValue int) (err error) {
-	var privateLite *common.PrivateItem
+func (s *roleRegistryImpl) verifyRole(rolePtr *common.RoleView, privilegePath string, privilegeValue int) (err error) {
+	var privilegeLite *common.Privilege
 	//for {
 	// 如果是处于初始化状态的administrator账号，则认为有权限(特殊判断)
 	//if accountInfoVal.Account == "administrator" && accountInfoVal.Status.IsInitStatus() && accountInfoVal.Role == nil {
 	//	return nil
 	//}
 
-	privateLite = s.checkPrivate(privatePath, privateRole)
+	privilegeLite = s.checkPrivilege(privilegePath, rolePtr)
 	//	break
 	//}
-	if privateLite == nil {
+	if privilegeLite == nil {
 		return fmt.Errorf("无效权限组")
 	}
 
-	if privateLite.Value.Value >= privateValue {
+	if privilegeLite.Value.Value >= privilegeValue {
 		return nil
 	}
 
 	return fmt.Errorf("当前账号无操作权限")
 }
 
-func (s *roleRegistryImpl) checkPrivate(privatePath string, privateRole *common.RoleView) (ret *common.PrivateItem) {
-	if privateRole == nil {
+func (s *roleRegistryImpl) checkPrivilege(privilegePath string, rolePtr *common.RoleView) (ret *common.Privilege) {
+	if rolePtr == nil {
 		return
 	}
 
-	for ii := range privateRole.Private {
-		val := privateRole.Private[ii]
+	for ii := range rolePtr.Privilege {
+		val := rolePtr.Privilege[ii]
 		if val.Path == "*" {
 			ret = val
 			break
 		}
 
-		if val.Path == privatePath {
+		if val.Path == privilegePath {
 			ret = val
 			break
 		}

@@ -16,7 +16,7 @@ type CasVerifier interface {
 	Verify(ctx context.Context, res http.ResponseWriter, req *http.Request) (*common.EntityView, error)
 }
 
-// CasRegistry private route registry
+// CasRegistry cas route registry
 type CasRegistry interface {
 	SetApiVersion(version string)
 

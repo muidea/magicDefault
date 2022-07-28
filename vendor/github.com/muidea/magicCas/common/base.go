@@ -54,6 +54,9 @@ type EntityView struct {
 }
 
 func (s *EntityView) FromEntity(ptr *model.Entity) {
+	if ptr == nil {
+		return
+	}
 	s.ID = ptr.ID
 	s.EID = ptr.EID
 	s.EName = ptr.EName
@@ -139,51 +142,51 @@ func UnknownEntity() *EntityView {
 }
 
 const (
-	// InvalidPrivate 无效权限
-	InvalidPrivate = iota
-	// UnSetPrivate 未设权限
-	UnSetPrivate
-	// ReadPrivate 只读权限
-	ReadPrivate
-	// WritePrivate 可写权限
-	WritePrivate
-	// DeletePrivate 删除权限
-	DeletePrivate
-	// AllPrivate 全部权限
-	AllPrivate
+	// InvalidPermission 无效权限
+	InvalidPermission = iota
+	// UnSetPermission 未设权限
+	UnSetPermission
+	// ReadPermission 只读权限
+	ReadPermission
+	// WritePermission 可写权限
+	WritePermission
+	// DeletePermission 删除权限
+	DeletePermission
+	// AllPermission 全部权限
+	AllPermission
 )
 
-// PrivateInfo private info
-type PrivateInfo struct {
+// Permission info
+type Permission struct {
 	Value int    `json:"value"`
 	Name  string `json:"name"`
 }
 
-var privateInfoList = []*PrivateInfo{
-	{Value: InvalidPrivate, Name: "无效权限"},
-	{Value: UnSetPrivate, Name: "未设权限"},
-	{Value: ReadPrivate, Name: "只读权限"},
-	{Value: WritePrivate, Name: "可写权限"},
-	{Value: DeletePrivate, Name: "删除权限"},
-	{Value: AllPrivate, Name: "全部权限"},
+var permissionList = []*Permission{
+	{Value: InvalidPermission, Name: "无效权限"},
+	{Value: UnSetPermission, Name: "未设权限"},
+	{Value: ReadPermission, Name: "只读权限"},
+	{Value: WritePermission, Name: "可写权限"},
+	{Value: DeletePermission, Name: "删除权限"},
+	{Value: AllPermission, Name: "全部权限"},
 }
 
-// GetPrivateInfoList get private info list
-func GetPrivateInfoList() []*PrivateInfo {
-	return privateInfoList
+// GetPermissionList get permission list
+func GetPermissionList() []*Permission {
+	return permissionList
 }
 
-// GetPrivateInfo get private info
-func GetPrivateInfo(value int) (ret *PrivateInfo) {
+// GetPermission get permission
+func GetPermission(value int) (ret *Permission) {
 	switch value {
-	case UnSetPrivate,
-		ReadPrivate,
-		WritePrivate,
-		DeletePrivate,
-		AllPrivate:
-		ret = privateInfoList[value]
+	case UnSetPermission,
+		ReadPermission,
+		WritePermission,
+		DeletePermission,
+		AllPermission:
+		ret = permissionList[value]
 	default:
-		ret = privateInfoList[0]
+		ret = permissionList[0]
 	}
 
 	return
@@ -198,6 +201,9 @@ type LogView struct {
 }
 
 func (s *LogView) FromLog(ptr *model.Log, createrPtr *model.Entity) {
+	if ptr == nil {
+		return
+	}
 	s.ID = ptr.ID
 	s.Address = ptr.Address
 	s.Memo = ptr.Memo
@@ -254,10 +260,10 @@ type AccessLogListResult struct {
 	AccessLog []*LogView `json:"accessLog"`
 }
 
-// EnumPrivateItemResult enum private item result
-type EnumPrivateItemResult struct {
+// EnumPrivilegeItemResult enum privilege item result
+type EnumPrivilegeItemResult struct {
 	commonDef.Result
-	Private []*PrivateItem `json:"private"`
+	Privilege []*Privilege `json:"privilege"`
 }
 
 type TimerNotify struct {

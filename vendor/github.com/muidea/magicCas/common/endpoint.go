@@ -30,6 +30,9 @@ type EndpointView struct {
 
 // FromEndpoint from endpoint
 func (s *EndpointView) FromEndpoint(ptr *model.Endpoint) {
+	if ptr == nil {
+		return
+	}
 	s.ID = ptr.ID
 	s.Endpoint = ptr.Endpoint
 	s.Description = ptr.Description
@@ -73,6 +76,9 @@ type EndpointLite struct {
 }
 
 func (s *EndpointLite) FromEndpoint(ptr *model.Endpoint) {
+	if ptr == nil {
+		return
+	}
 	s.ID = ptr.ID
 	s.Endpoint = ptr.Endpoint
 	s.IdentifyID = ptr.IdentifyID

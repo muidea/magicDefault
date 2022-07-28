@@ -22,12 +22,15 @@ type ValidityView struct {
 	Expired   int   `json:"expired"`
 }
 
-func (s *ValidityView) FromValidity(validity *model.Validity) {
-	s.ID = validity.ID
-	s.StartTime = validity.StartTime
-	s.EndTime = validity.EndTime
-	if validity.EndTime > 0 {
-		s.Expired = validity.Expire()
+func (s *ValidityView) FromValidity(ptr *model.Validity) {
+	if ptr == nil {
+		return
+	}
+	s.ID = ptr.ID
+	s.StartTime = ptr.StartTime
+	s.EndTime = ptr.EndTime
+	if ptr.EndTime > 0 {
+		s.Expired = ptr.Expire()
 		return
 	}
 
@@ -59,6 +62,9 @@ func (s *NamespaceView) Disable() bool {
 }
 
 func (s *NamespaceView) FromNamespace(ptr *model.Namespace) {
+	if ptr == nil {
+		return
+	}
 	s.ID = ptr.ID
 	s.Name = ptr.Name
 	s.Short = ptr.Short
@@ -90,6 +96,9 @@ type NamespaceLite struct {
 }
 
 func (s *NamespaceLite) FromNamespace(ptr *model.Namespace) {
+	if ptr == nil {
+		return
+	}
 	s.ID = ptr.ID
 	s.Name = ptr.Name
 	s.Short = ptr.Short

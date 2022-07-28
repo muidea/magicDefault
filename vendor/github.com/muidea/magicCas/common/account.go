@@ -30,6 +30,10 @@ type AccountView struct {
 
 // FromAccount from account
 func (s *AccountView) FromAccount(ptr *model.Account) {
+	if ptr == nil {
+		return
+	}
+
 	s.ID = ptr.ID
 	s.Account = ptr.Account
 	s.EMail = ptr.EMail
@@ -69,12 +73,18 @@ type AccountLite struct {
 }
 
 func (s *AccountLite) FromAccount(ptr *model.Account) {
+	if ptr == nil {
+		return
+	}
 	s.ID = ptr.ID
 	s.Account = ptr.Account
 	s.Status = GetStatus(ptr.Status)
 }
 
 func (s *AccountLite) FromAccountView(ptr *AccountView) {
+	if ptr == nil {
+		return
+	}
 	s.ID = ptr.ID
 	s.Account = ptr.Account
 	s.Status = ptr.Status

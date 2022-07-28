@@ -20,27 +20,31 @@ const superID = 999999
 // SuperRole get super role
 func SuperRole() *model.Role {
 	return &model.Role{
-		ID:      superID,
-		Name:    "superRole",
-		Private: []*model.Private{{ID: 999999, Value: AllPrivate, Path: "*"}},
+		ID:        superID,
+		Name:      "superRole",
+		Privilege: []*model.Privilege{{ID: 999999, Value: AllPermission, Path: "*"}},
 	}
 }
 
 type RoleView struct {
-	ID          int            `json:"id"`
-	Name        string         `json:"name"`
-	Description string         `json:"description"`
-	Private     []*PrivateItem `json:"private"`
+	ID          int          `json:"id"`
+	Name        string       `json:"name"`
+	Description string       `json:"description"`
+	Privilege   []*Privilege `json:"privilege"`
 }
 
 func (s *RoleView) FromRole(ptr *model.Role) {
+	if ptr == nil {
+		return
+	}
+
 	s.ID = ptr.ID
 	s.Name = ptr.Name
 	s.Description = ptr.Description
-	for _, val := range ptr.Private {
-		item := &PrivateItem{}
-		item.FromPrivate(val)
-		s.Private = append(s.Private, item)
+	for _, val := range ptr.Privilege {
+		item := &Privilege{}
+		item.FromPrivilege(val)
+		s.Privilege = append(s.Privilege, item)
 	}
 }
 
@@ -51,8 +55,8 @@ func (s *RoleView) ToRole() (ret *model.Role) {
 		Description: s.Description,
 	}
 
-	for _, val := range s.Private {
-		ret.Private = append(ret.Private, val.ToPrivate())
+	for _, val := range s.Privilege {
+		ret.Privilege = append(ret.Privilege, val.ToPrivilege())
 	}
 
 	return
@@ -68,6 +72,9 @@ type RoleLite struct {
 }
 
 func (s *RoleLite) FromRole(ptr *model.Role) {
+	if ptr == nil {
+		return
+	}
 	s.ID = ptr.ID
 	s.Name = ptr.Name
 }
@@ -76,27 +83,30 @@ func (s *RoleLite) ToRole() (ret *model.Role) {
 	return &model.Role{ID: s.ID, Name: s.Name}
 }
 
-// PrivateItem 单条配置项
-type PrivateItem struct {
-	ID    int          `json:"id"`
-	Path  string       `json:"path"`
-	Value *PrivateInfo `json:"value"`
+// Privilege 单条配置项
+type Privilege struct {
+	ID    int         `json:"id"`
+	Path  string      `json:"path"`
+	Value *Permission `json:"value"`
 }
 
-func (s *PrivateItem) FromPrivate(ptr *model.Private) {
+func (s *Privilege) FromPrivilege(ptr *model.Privilege) {
+	if ptr == nil {
+		return
+	}
 	s.ID = ptr.ID
 	s.Path = ptr.Path
-	s.Value = GetPrivateInfo(ptr.Value)
+	s.Value = GetPermission(ptr.Value)
 }
 
-func (s *PrivateItem) ToPrivate() *model.Private {
-	return &model.Private{ID: s.ID, Value: s.Value.Value, Path: s.Path}
+func (s *Privilege) ToPrivilege() *model.Privilege {
+	return &model.Privilege{ID: s.ID, Value: s.Value.Value, Path: s.Path}
 }
 
 type RoleParam struct {
-	Name        string         `json:"name" validate:"required"`
-	Description string         `json:"description"`
-	Private     []*PrivateItem `json:"private"`
+	Name        string       `json:"name" validate:"required"`
+	Description string       `json:"description"`
+	Privilege   []*Privilege `json:"privilege"`
 }
 
 func (s *RoleParam) ToRole() (ret *model.Role) {
@@ -105,8 +115,8 @@ func (s *RoleParam) ToRole() (ret *model.Role) {
 		Description: s.Description,
 	}
 
-	for _, val := range s.Private {
-		ret.Private = append(ret.Private, val.ToPrivate())
+	for _, val := range s.Privilege {
+		ret.Privilege = append(ret.Privilege, val.ToPrivilege())
 	}
 
 	return

@@ -74,5 +74,10 @@ func (s *Account) SupperAccount() bool {
 }
 
 func DefaultSuperAccount() *Account {
-	return &Account{Account: "administrator", Password: "administrator", Description: "default administrator"}
+	return &Account{
+		Account:     "administrator",
+		Password:    "administrator",
+		EMail:       "rangh@foxmail.com",
+		Description: "default administrator",
+	}
 }

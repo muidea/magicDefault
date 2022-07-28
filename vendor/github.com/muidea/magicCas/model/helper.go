@@ -10,7 +10,7 @@ var modelList = []interface{}{
 	&Endpoint{},
 	&Validity{},
 	&Namespace{},
-	&Private{},
+	&Privilege{},
 	&Role{},
 }
 

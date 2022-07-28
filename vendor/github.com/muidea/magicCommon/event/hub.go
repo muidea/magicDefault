@@ -3,6 +3,8 @@ package event
 import (
 	"strings"
 	"sync"
+
+	log "github.com/cihub/seelog"
 )
 
 type Values map[string]interface{}
@@ -82,6 +84,12 @@ type Observer interface {
 	Notify(event Event, result Result)
 }
 
+type SimpleObserver interface {
+	Observer
+	Subscribe(eventID string, observerFunc ObserverFunc)
+	Unsubscribe(eventID string)
+}
+
 type Hub interface {
 	Subscribe(eventID string, observer Observer)
 	Unsubscribe(eventID string, observer Observer)
@@ -93,11 +101,17 @@ type Hub interface {
 
 type ObserverList []Observer
 type ID2ObserverMap map[string]ObserverList
+type ObserverFunc func(Event, Result)
+type ID2ObserverFuncMap map[string]ObserverFunc
 
 func NewHub() Hub {
 	hub := &hImpl{event2Observer: ID2ObserverMap{}, actionChannel: make(chan action)}
 	go hub.run()
 	return hub
+}
+
+func NewSimpleObserver(id string, hub Hub) SimpleObserver {
+	return &simpleObserver{id: id, eventHub: hub, id2ObserverFunc: ID2ObserverFuncMap{}}
 }
 
 func matchID(pattern, id string) bool {
@@ -314,7 +328,7 @@ func (s *hImpl) Call(event Event) Result {
 		return nil
 	}
 
-	result := NewResult()
+	result := NewResult(event.ID(), event.Source(), event.Destination())
 	s.sendInternal(event, result)
 	return result
 }
@@ -354,7 +368,7 @@ func (s *hImpl) run() {
 			s.postInternal(data.event)
 		case send:
 			data := action.(*sendData)
-			result := NewResult()
+			result := NewResult(data.event.ID(), data.event.Source(), data.event.Destination())
 			s.sendInternal(data.event, result)
 			data.result <- result
 		case terminate:
@@ -376,7 +390,16 @@ func (s *hImpl) subscribeInternal(eventID string, observer Observer) {
 	if !observerOK {
 		observerList = ObserverList{}
 	}
-	observerList = append(observerList, observer)
+	existFlag := false
+	for _, val := range observerList {
+		if val.ID() == observer.ID() {
+			existFlag = true
+			break
+		}
+	}
+	if !existFlag {
+		observerList = append(observerList, observer)
+	}
 	s.event2Observer[eventID] = observerList
 }
 
@@ -433,4 +456,64 @@ func (s *hImpl) sendInternal(event Event, result Result) {
 			}
 		}
 	}
+}
+
+type simpleObserver struct {
+	id              string
+	eventHub        Hub
+	id2ObserverFunc ID2ObserverFuncMap
+	idLock          sync.RWMutex
+}
+
+func (s *simpleObserver) ID() string {
+	return s.id
+}
+
+func (s *simpleObserver) Notify(event Event, result Result) {
+	var funcVal ObserverFunc
+	func() {
+		s.idLock.RLock()
+		defer s.idLock.RUnlock()
+
+		for k, v := range s.id2ObserverFunc {
+			if event.Match(k) {
+				funcVal = v
+				break
+			}
+		}
+	}()
+
+	if funcVal != nil {
+		funcVal(event, result)
+	}
+
+	return
+}
+
+func (s *simpleObserver) Subscribe(eventID string, observerFunc ObserverFunc) {
+	s.idLock.Lock()
+	defer s.idLock.Unlock()
+
+	_, ok := s.id2ObserverFunc[eventID]
+	if ok {
+		log.Errorf("duplicate eventID:%v", eventID)
+		return
+	}
+
+	s.id2ObserverFunc[eventID] = observerFunc
+	s.eventHub.Subscribe(eventID, s)
+}
+
+func (s *simpleObserver) Unsubscribe(eventID string) {
+	s.idLock.Lock()
+	defer s.idLock.Unlock()
+
+	_, ok := s.id2ObserverFunc[eventID]
+	if !ok {
+		log.Errorf("not exist eventID:%v", eventID)
+		return
+	}
+
+	delete(s.id2ObserverFunc, eventID)
+	s.eventHub.Unsubscribe(eventID, s)
 }

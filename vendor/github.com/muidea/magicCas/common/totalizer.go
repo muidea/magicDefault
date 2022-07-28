@@ -21,6 +21,9 @@ type TotalizerView struct {
 }
 
 func (s *TotalizerView) FromTotalizer(ptr *model.Totalizer) {
+	if ptr == nil {
+		return
+	}
 	s.ID = ptr.ID
 	s.Owner = ptr.Owner
 	s.Type = ptr.Type
